@@ -5,7 +5,6 @@
 基于 Microsoft vcpkg 的中文优化版本，针对国内开发者做了以下加速和优化：
 
 - GitHub 下载全量加速（通过 `down.npee.cn` 镜像）
-- 阿里云 asset cache 预配置
 - 解决中文用户名导致 MSVC 编译失败的问题
 - 附带常用库的预编译缓存（raylib、glfw3 等）
 
@@ -65,23 +64,8 @@ endforeach()
 
 ### 下载优先级
 
-1. 阿里云 asset cache（已缓存的包直接命中）
-2. `down.npee.cn` 镜像（GitHub 源加速）
-3. 原始 GitHub URL（兜底）
-
-## 已安装的包
-
-| 包名 | 版本 | 说明 |
-|------|------|------|
-| raylib | 6.0 | 简易游戏开发库（audio + core） |
-| glfw3 | 3.4 | OpenGL 窗口和输入库 |
-| dirent | 1.26 | POSIX dirent 接口 |
-| drlibs | 2026-03-03 | 单头文件音频库 |
-| miniaudio | 0.11.25 | 单头文件音频播放 |
-| mmx | 2025-03-19 | 轻量工具集 |
-| nanosvg | 2023-12-29 | SVG 解析库 |
-| qoi | 2025-05-09 | QOI 图像格式 |
-| stb | 2024-07-29 | 单头文件工具库 |
+1. `down.npee.cn` 镜像（GitHub 源加速）
+2. 原始 GitHub URL（兜底）
 
 ## 与上游 vcpkg 的区别
 
