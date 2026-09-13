@@ -1,0 +1,19 @@
+{
+  "packages": [
+{
+  "SPDXID" : "SPDXRef-resource-0",
+  "checksums" : 
+  [
+    {
+      "algorithm" : "SHA512",
+      "checksumValue" : "a1422ac827334d9e4adcbb7bc9b51244659c1c6e07b8e5ab3af2b82c5ac4842c4fb54a6a19d02e287eb2a8c3f470f556b2d111e23f10cae83a7ffb4e36ebc04f"
+    }
+  ],
+  "copyrightText" : "NOASSERTION",
+  "downloadLocation" : "git+https://github.com/mackron/dr_libs@fa931f3285ced10ace628f7f1ac951e1951e7ea6",
+  "licenseConcluded" : "NOASSERTION",
+  "licenseDeclared" : "NOASSERTION",
+  "name" : "mackron/dr_libs"
+}
+  ]
+}

@@ -1,0 +1,19 @@
+{
+  "packages": [
+{
+  "SPDXID" : "SPDXRef-resource-0",
+  "checksums" : 
+  [
+    {
+      "algorithm" : "SHA512",
+      "checksumValue" : "ab3f8e0e6a02e9e481e4d44a1b7809360ad013e25c8c58e84ea0ea03317dd5fc0acc26f7a30ac226714c45cc9dabe45f979dd7a4b0571ae5c6051f4bb0db6d9f"
+    }
+  ],
+  "copyrightText" : "NOASSERTION",
+  "downloadLocation" : "git+https://github.com/phoboslab/qoi@4461cc37ef08b24f157a5ab7c3f7d6c9e6caa6c0",
+  "licenseConcluded" : "NOASSERTION",
+  "licenseDeclared" : "NOASSERTION",
+  "name" : "phoboslab/qoi"
+}
+  ]
+}

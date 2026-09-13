@@ -1,0 +1,19 @@
+{
+  "packages": [
+{
+  "SPDXID" : "SPDXRef-resource-0",
+  "checksums" : 
+  [
+    {
+      "algorithm" : "SHA512",
+      "checksumValue" : "5010f3e8c049a670e65bf8a83ffcd27ef7382a2cfaeac1caf59760b4e43a3351e7d46dd1688ad0ae8e383e32875f74805b9fb7a09cf29d419b5634176afaa233"
+    }
+  ],
+  "copyrightText" : "NOASSERTION",
+  "downloadLocation" : "git+https://github.com/vurtun/mmx@5a3f3aba052e63ffae8eb0214c6bb8ffffedea3c",
+  "licenseConcluded" : "NOASSERTION",
+  "licenseDeclared" : "NOASSERTION",
+  "name" : "vurtun/mmx"
+}
+  ]
+}
