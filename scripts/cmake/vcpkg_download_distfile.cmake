@@ -1,28 +1,28 @@
-function(z_vcpkg_download_distfile out_var)
+﻿function(z_vcpkg_download_distfile out_var)
     cmake_parse_arguments(PARSE_ARGV 1 arg
         "SKIP_SHA512;SILENT_EXIT;QUIET;ALWAYS_REDOWNLOAD"
         "FILENAME;SHA512"
         "URLS;HEADERS"
     )
 
-    # SILENT_EXIT and QUIET are meaningless but accepting and ignoring them allows
-    # vcpkg_download_distfile to pass through parameters without needing manipulation.
+    # SILENT_EXIT 和 QUIET 无实际意义，但接受并忽略它们可以让
+    # vcpkg_download_distfile 直接透传参数而无需额外处理。
     if(NOT DEFINED arg_URLS)
-        message(FATAL_ERROR "vcpkg_download_distfile requires a URLS argument.")
+        message(FATAL_ERROR "vcpkg_download_distfile 需要 URLS 参数。")
     endif()
     if(NOT DEFINED arg_FILENAME)
-        message(FATAL_ERROR "vcpkg_download_distfile requires a FILENAME argument.")
+        message(FATAL_ERROR "vcpkg_download_distfile 需要 FILENAME 参数。")
     endif()
-    # Note that arg_ALWAYS_REDOWNLOAD implies arg_SKIP_SHA512, and NOT arg_SKIP_SHA512 implies NOT arg_ALWAYS_REDOWNLOAD
+    # 注意 arg_ALWAYS_REDOWNLOAD 隐含 arg_SKIP_SHA512，而非 arg_SKIP_SHA512 隐含非 arg_ALWAYS_REDOWNLOAD
     if(arg_ALWAYS_REDOWNLOAD AND NOT arg_SKIP_SHA512)
-        message(FATAL_ERROR "ALWAYS_REDOWNLOAD requires SKIP_SHA512")
+        message(FATAL_ERROR "ALWAYS_REDOWNLOAD 需要 SKIP_SHA512")
     endif()
 
     if(NOT arg_SKIP_SHA512 AND NOT DEFINED arg_SHA512)
-        message(FATAL_ERROR "vcpkg_download_distfile requires a SHA512 argument.
-If you do not know the SHA512, add it as 'SHA512 0' and retry.")
+        message(FATAL_ERROR "vcpkg_download_distfile 需要 SHA512 参数。
+如果你不知道 SHA512 值，请将其设为 'SHA512 0' 后重试。")
     elseif(arg_SKIP_SHA512 AND DEFINED arg_SHA512)
-        message(FATAL_ERROR "SHA512 may not be used with SKIP_SHA512.")
+        message(FATAL_ERROR "SHA512 不能与 SKIP_SHA512 同时使用。")
     endif()
 
     if(_VCPKG_INTERNAL_NO_HASH_CHECK)
@@ -35,8 +35,8 @@ If you do not know the SHA512, add it as 'SHA512 0' and retry.")
         else()
             string(LENGTH "${arg_SHA512}" arg_SHA512_length)
             if(NOT "${arg_SHA512_length}" EQUAL "128" OR NOT "${arg_SHA512}" MATCHES "^[a-zA-Z0-9]*$")
-                message(FATAL_ERROR "Invalid SHA512: ${arg_SHA512}.
-    If you do not know the file's SHA512, set this to \"0\".")
+                message(FATAL_ERROR "无效的 SHA512: ${arg_SHA512}。
+    如果你不知道文件的 SHA512 值，请将其设为 \"0\"。")
             endif()
 
             string(TOLOWER "${arg_SHA512}" arg_SHA512)
@@ -56,23 +56,23 @@ If you do not know the SHA512, add it as 'SHA512 0' and retry.")
         if(arg_SKIP_SHA512)
             if(NOT arg_ALWAYS_REDOWNLOAD)
                 if(NOT _VCPKG_INTERNAL_NO_HASH_CHECK)
-                    message(STATUS "Skipping hash check and using cached ${arg_FILENAME}")
+                    message(STATUS "跳过哈希校验，使用缓存的 ${arg_FILENAME}")
                 endif()
 
                 set("${out_var}" "${downloaded_file_path}" PARENT_SCOPE)
                 return()
             endif()
         else()
-            # Note that NOT arg_SKIP_SHA512 implies NOT arg_ALWAYS_REDOWNLOAD
+            # 注意 非 arg_SKIP_SHA512 隐含非 arg_ALWAYS_REDOWNLOAD
             file(SHA512 "${downloaded_file_path}" file_hash)
             if("${file_hash}" STREQUAL "${arg_SHA512}")
-                message(STATUS "Using cached ${arg_FILENAME}")
+                message(STATUS "使用缓存的 ${arg_FILENAME}")
                 set("${out_var}" "${downloaded_file_path}" PARENT_SCOPE)
                 return()
             endif()
 
-            # The existing file hash mismatches. Perhaps the expected SHA512 changed. Try adding the expected SHA512
-            # into the file name and try again to hopefully not conflict.
+            # 已有文件的哈希不匹配。可能是期望的 SHA512 发生了变化。尝试将期望的 SHA512
+            # 加入文件名后重新尝试，以尽量避免冲突。
             get_filename_component(filename_component "${arg_FILENAME}" NAME_WE)
             get_filename_component(extension_component "${arg_FILENAME}" EXT)
             string(SUBSTRING "${arg_SHA512}" 0 8 hash)
@@ -84,32 +84,32 @@ If you do not know the SHA512, add it as 'SHA512 0' and retry.")
             set(downloaded_file_path "${DOWNLOADS}/${arg_FILENAME}")
             if(EXISTS "${downloaded_file_path}")
                 if(_VCPKG_NO_DOWNLOADS)
-                    set(advice_message "note: Downloads are disabled. Please ensure that the expected file is placed at ${downloaded_file_path} and retry.")
+                    set(advice_message "提示: 下载已禁用。请确保期望的文件已放置在 ${downloaded_file_path} 后重试")
                 else()
-                    set(advice_message "note: You may be able to resolve this failure by redownloading the file. To do so, delete ${downloaded_file_path} and retry.")
+                    set(advice_message "提示: 你可以通过重新下载文件来解决此问题。请删除 ${downloaded_file_path} 后重试")
                 endif()
 
                 file(SHA512 "${downloaded_file_path}" file_hash)
                 if("${file_hash}" STREQUAL "${arg_SHA512}")
-                    message(STATUS "Using cached ${arg_FILENAME}")
+                    message(STATUS "使用缓存的 ${arg_FILENAME}")
                     set("${out_var}" "${downloaded_file_path}" PARENT_SCOPE)
                     return()
                 endif()
 
-                # Note that the extra leading spaces are here to prevent CMake from badly attempting to wrap this
+                # 注意：额外的前导空格是为了防止 CMake 错误地尝试换行
                 message(FATAL_ERROR
-                    "  ${downloaded_file_path}: error: existing downloaded file had an unexpected hash\n"
-                    "  Expected: ${arg_SHA512}\n"
-                    "  Actual  : ${file_hash}\n"
+                    "  ${downloaded_file_path}: 错误: 已下载的文件哈希值不符合预期\n"
+                    "  期望值: ${arg_SHA512}\n"
+                    "  实际值: ${file_hash}\n"
                     "  ${advice_message}")
             endif()
         endif()
     endif()
 
-    # vcpkg_download_distfile_ALWAYS_REDOWNLOAD only triggers when NOT _VCPKG_NO_DOWNLOADS
-    # this could be de-morgan'd out but it's more clear this way
+    # vcpkg_download_distfile_ALWAYS_REDOWNLOAD 仅在非 _VCPKG_NO_DOWNLOADS 时触发
+    # 这里可以用德摩根律简化，但当前写法更清晰
     if(_VCPKG_NO_DOWNLOADS)
-        message(FATAL_ERROR "Downloads are disabled, but '${downloaded_file_path}' does not exist.")
+        message(FATAL_ERROR "下载已禁用，但 '${downloaded_file_path}' 不存在")
     endif()
 
     vcpkg_list(SET params "x-download" "${arg_FILENAME}")
@@ -137,11 +137,11 @@ If you do not know the SHA512, add it as 'SHA512 0' and retry.")
         vcpkg_list(APPEND params "--sha512=${arg_SHA512}")
     endif()
 
-    # Setting WORKING_DIRECTORY and passing the relative FILENAME allows vcpkg x-download to print
-    # the full relative path if FILENAME has /s in it.
+    # 设置 WORKING_DIRECTORY 并传入相对路径 FILENAME，使得 vcpkg x-download 能打印
+    # 包含 / 的完整相对路径。
     vcpkg_execute_in_download_mode(COMMAND "$ENV{VCPKG_COMMAND}" ${params} RESULT_VARIABLE error_code WORKING_DIRECTORY "${DOWNLOADS}")
     if(NOT "${error_code}" EQUAL "0")
-        message(FATAL_ERROR "Download failed, halting portfile.")
+        message(FATAL_ERROR "下载失败，终止 portfile 执行")
     endif()
 
     set("${out_var}" "${downloaded_file_path}" PARENT_SCOPE)
@@ -154,12 +154,12 @@ function(vcpkg_download_distfile out_var)
         "URLS;HEADERS"
     )
     if(DEFINED arg_UNPARSED_ARGUMENTS)
-        # backcompat needed to be preserved for
+        # 需要保留向后兼容性，参见
         # https://github.com/microsoft/vcpkg/blob/68b3d3404d0bc6f2a2287f64ed5f6aa777e70d56/ports/liblas/portfile.cmake#L9
-        message("${Z_VCPKG_BACKCOMPAT_MESSAGE_LEVEL}" "vcpkg_download_distfile was passed extra arguments: ${arg_UNPARSED_ARGUMENTS}")
+        message("${Z_VCPKG_BACKCOMPAT_MESSAGE_LEVEL}" "vcpkg_download_distfile 收到了多余参数: ${arg_UNPARSED_ARGUMENTS}")
     endif()
     if(arg_SILENT_EXIT)
-        message(WARNING "SILENT_EXIT no longer has any effect. To resolve this warning, remove SILENT_EXIT.")
+        message(WARNING "SILENT_EXIT 已无任何效果。要消除此警告，请移除 SILENT_EXIT")
     endif()
 
     z_vcpkg_function_arguments(forwarded_args 1)
