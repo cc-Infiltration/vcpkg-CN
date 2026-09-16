@@ -151,8 +151,25 @@ vcpkgCheckEqualFileHash()
 
 vcpkgDownloadFile()
 {
-    url=$1; downloadPath=$2 sha512=$3
+    url=$1; downloadPath=$2; sha512=$3
     rm -rf "$downloadPath.part"
+
+    # GitHub 链接优先使用镜像加速
+    case "$url" in
+        https://github.com/*)
+            mirrorUrl="https://down.npee.cn?$url"
+            echo "正在从镜像下载: $mirrorUrl"
+            if curl -L "$mirrorUrl" --tlsv1.2 --create-dirs --retry 1 --output "$downloadPath.part" --silent --show-error --fail 2>/dev/null; then
+                vcpkgCheckEqualFileHash "$url" "$downloadPath.part" "$sha512"
+                chmod +x "$downloadPath.part"
+                mv "$downloadPath.part" "$downloadPath"
+                return
+            fi
+            echo "镜像下载失败，回退到原始地址。"
+            rm -rf "$downloadPath.part"
+            ;;
+    esac
+
     curl -L $url --tlsv1.2 --create-dirs --retry 3 --output "$downloadPath.part" --silent --show-error --fail || exit 1
 
     vcpkgCheckEqualFileHash $url "$downloadPath.part" $sha512
@@ -249,22 +266,22 @@ fi
 
 "$vcpkgRootDir/vcpkg" version --disable-metrics
 
-# Apply the disable-metrics marker file.
+# 应用遥测禁用标记文件
 if [ "$vcpkgDisableMetrics" = "ON" ]; then
     touch "$vcpkgRootDir/vcpkg.disable-metrics"
 elif ! [ -f "$vcpkgRootDir/vcpkg.disable-metrics" ]; then
-    # Note that we intentionally leave any existing vcpkg.disable-metrics; once a user has
-    # opted out they should stay opted out.
+    # 如果用户已选择退出遥测，则保持退出状态不变
     cat <<EOF
-Telemetry
----------
-vcpkg collects usage data in order to help us improve your experience.
-The data collected by Microsoft is anonymous.
-You can opt-out of telemetry by re-running the bootstrap-vcpkg script with -disableMetrics,
-passing --disable-metrics to vcpkg on the command line,
-or by setting the VCPKG_DISABLE_METRICS environment variable.
+遥测
+----
+vcpkg 会收集使用数据以帮助改善用户体验。
+Microsoft 收集的数据是匿名的。
+你可以通过以下方式退出遥测：
+  - 重新运行 bootstrap-vcpkg 脚本并添加 -disableMetrics 参数
+  - 在命令行中向 vcpkg 传递 --disable-metrics 参数
+  - 设置 VCPKG_DISABLE_METRICS 环境变量
 
-Read more about vcpkg telemetry at https://learn.microsoft.com/vcpkg/about/privacy
-Read the Microsoft Privacy Statement at https://go.microsoft.com/fwlink/?LinkId=521839
+了解更多：https://learn.microsoft.com/vcpkg/about/privacy
+Microsoft 隐私声明：https://go.microsoft.com/fwlink/?LinkId=521839
 EOF
 fi
