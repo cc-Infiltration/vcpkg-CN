@@ -1,21 +1,21 @@
-macro(z_vcpkg_list_escape_once_more lst)
+﻿macro(z_vcpkg_list_escape_once_more lst)
     string(REPLACE [[\;]] [[\\;]] "${lst}" "${${lst}}")
 endmacro()
 
 function(vcpkg_list)
-    # NOTE: as this function replaces an existing CMake command,
-    # it does not use cmake_parse_arguments
+    # 注意: 此函数替换了已有的 CMake 命令，
+    # 因此不使用 cmake_parse_arguments
 
     # vcpkg_list(<operation> <list_var> ...)
     #            A0          A1
 
     if(ARGC LESS "2")
-        message(FATAL_ERROR "vcpkg_list requires at least two arguments.")
+        message(FATAL_ERROR "vcpkg_list 至少需要两个参数。")
     endif()
 
     if(ARGV1 MATCHES "^ARGV([0-9]*)$|^ARG[CN]$|^CMAKE_CURRENT_FUNCTION")
-        message(FATAL_ERROR "vcpkg_list does not support the list_var being ${ARGV1}.
-    Please use a different variable name.")
+        message(FATAL_ERROR "vcpkg_list 不支持将 list_var 设为 ${ARGV1}。
+    请使用其他变量名。")
     endif()
 
     set(list "${${ARGV1}}")
@@ -28,12 +28,12 @@ function(vcpkg_list)
         return()
     endif()
 
-    # Normal reading functions
+    # 常规读取函数
     if(operation STREQUAL "LENGTH")
         # vcpkg_list(LENGTH <list-var> <out-var>)
         #            A0     A1         A2
         if(NOT ARGC EQUAL "3")
-            message(FATAL_ERROR "vcpkg_list sub-command ${operation} requires two arguments.")
+            message(FATAL_ERROR "vcpkg_list 子命令 ${operation} 需要两个参数。")
         endif()
         list(LENGTH list out)
         set("${ARGV2}" "${out}" PARENT_SCOPE)
@@ -43,14 +43,14 @@ function(vcpkg_list)
         # vcpkg_list(<operation> <list-var> <arg> <out-var>)
         #            A0          A1         A2    A3
         if(NOT ARGC EQUAL "4")
-            message(FATAL_ERROR "vcpkg_list sub-command ${operation} requires three arguments.")
+            message(FATAL_ERROR "vcpkg_list 子命令 ${operation} 需要三个参数。")
         endif()
         if(operation STREQUAL "GET")
             list(LENGTH list length)
             if(length EQUAL "0")
-                message(FATAL_ERROR "vcpkg_list GET given empty list")
+                message(FATAL_ERROR "vcpkg_list GET 收到空列表")
             elseif(ARGV2 GREATER_EQUAL length OR ARGV2 LESS "-${length}")
-                message(FATAL_ERROR "vcpkg_list index: ${ARGV2} is not in range")
+                message(FATAL_ERROR "vcpkg_list 索引: ${ARGV2} 不在有效范围内")
             endif()
         endif()
         list("${operation}" list "${ARGV2}" out)
@@ -61,11 +61,11 @@ function(vcpkg_list)
         # vcpkg_list(SUBLIST <list-var> <begin> <length> <out-var>)
         #            A0      A1         A2      A3       A4
         if(NOT ARGC EQUAL "5")
-            message(FATAL_ERROR "vcpkg_list sub-command SUBLIST requires four arguments.")
+            message(FATAL_ERROR "vcpkg_list 子命令 SUBLIST 需要四个参数。")
         endif()
         list(LENGTH list length)
         if(ARGV2 LESS "0" OR (ARGV2 GREATER_EQUAL length AND NOT ARGV2 EQUAL "0"))
-            message(FATAL_ERROR "vcpkg_list begin index: ${ARGV2} is out of range")
+            message(FATAL_ERROR "vcpkg_list 起始索引: ${ARGV2} 超出范围")
         endif()
         z_vcpkg_list_escape_once_more(list)
         list(SUBLIST list "${ARGV2}" "${ARGV3}" out)
@@ -73,13 +73,13 @@ function(vcpkg_list)
         return()
     endif()
 
-    # modification functions
+    # 修改函数
 
     if(operation MATCHES "^(APPEND|PREPEND)$")
         # vcpkg_list(<operation> <list> [<element>...])
         #            A0          A1      A2...
 
-        # if ARGC <= 2, then we don't have to do anything
+        # 如果 ARGC <= 2，则无需做任何操作
         if(ARGC GREATER 2)
             z_vcpkg_function_arguments(args 2)
             if(list STREQUAL "")
@@ -98,16 +98,16 @@ function(vcpkg_list)
 
         list(LENGTH list length)
         if(ARGV2 LESS "-{$length}" OR ARGV2 GREATER length)
-            message(FATAL_ERROR "vcpkg_list index: ${ARGV2} out of range")
+            message(FATAL_ERROR "vcpkg_list 索引: ${ARGV2} 超出范围")
         endif()
         if(ARGC GREATER 3)
-            # list(LENGTH) is one of the few subcommands that's fine
+            # list(LENGTH) 是少数没问题的子命令之一
             list(LENGTH list length)
             if(ARGV2 LESS "0")
                 math(EXPR ARGV2 "${length} + ${ARGV2}")
             endif()
             if(ARGV2 LESS "0" OR ARGV2 GREATER length)
-                message(FATAL_ERROR "list index: ${ARGV2} out of range (-${length}, ${length})")
+                message(FATAL_ERROR "list 索引: ${ARGV2} 超出范围 (-${length}, ${length})")
             endif()
 
             z_vcpkg_function_arguments(args 3)
@@ -123,7 +123,7 @@ function(vcpkg_list)
                 set("${list_var}" "${list_start};${args};${list_end}" PARENT_SCOPE)
             endif()
         elseif(ARGC LESS 3)
-            message(FATAL_ERROR "vcpkg_list sub-command INSERT requires at least two arguments.")
+            message(FATAL_ERROR "vcpkg_list 子命令 INSERT 至少需要两个参数。")
         endif()
         return()
     endif()
@@ -132,7 +132,7 @@ function(vcpkg_list)
         # vcpkg_list(<operation> <list>)
         #            A0          A1
         if(NOT ARGC EQUAL 2)
-            message(FATAL_ERROR "vcpkg_list sub-command ${operation} requires one argument.")
+            message(FATAL_ERROR "vcpkg_list 子命令 ${operation} 需要一个参数。")
         endif()
         z_vcpkg_list_escape_once_more(list)
         list("${operation}" list)
@@ -144,12 +144,12 @@ function(vcpkg_list)
         # vcpkg_list(<operation> <list> <index-or-item>)
         #            A0          A1     A2
         if(NOT ARGC EQUAL 3)
-            message(FATAL_ERROR "vcpkg_list sub-command ${operation} requires two arguments.")
+            message(FATAL_ERROR "vcpkg_list 子命令 ${operation} 需要两个参数。")
         endif()
         if(operation STREQUAL "REMOVE_AT")
             list(LENGTH list length)
             if(ARGV2 GREATER_EQUAL length OR ARGV2 LESS "-${length}")
-                message(FATAL_ERROR "vcpkg_list index: ${ARGV2} out of range")
+                message(FATAL_ERROR "vcpkg_list 索引: ${ARGV2} 超出范围")
             endif()
         endif()
 
@@ -161,5 +161,5 @@ function(vcpkg_list)
         return()
     endif()
 
-    message(FATAL_ERROR "vcpkg_list sub-command ${operation} is not yet implemented.")
+    message(FATAL_ERROR "vcpkg_list 子命令 ${operation} 尚未实现。")
 endfunction()

@@ -1,5 +1,5 @@
-function(z_run_jom_build invoke_command targets log_prefix log_suffix)
-    message(STATUS "Package ${log_prefix}-${TARGET_TRIPLET}-${log_suffix}")
+﻿function(z_run_jom_build invoke_command targets log_prefix log_suffix)
+    message(STATUS "打包 ${log_prefix}-${TARGET_TRIPLET}-${log_suffix}")
     vcpkg_execute_build_process(
         COMMAND "${invoke_command}" -j ${VCPKG_CONCURRENCY} ${targets}
         NO_PARALLEL_COMMAND "${invoke_command}" -j 1 ${targets}
@@ -9,17 +9,17 @@ function(z_run_jom_build invoke_command targets log_prefix log_suffix)
 endfunction()
 
 function(vcpkg_build_qmake)
-    # parse parameters such that semicolons in options arguments to COMMAND don't get erased
+    # 解析参数，使得 COMMAND 选项参数中的分号不会被擦除
     cmake_parse_arguments(PARSE_ARGV 0 arg
         "SKIP_MAKEFILES"
         "BUILD_LOGNAME"
         "TARGETS;RELEASE_TARGETS;DEBUG_TARGETS"
     )
 
-    # Make sure that the linker finds the libraries used
+    # 确保链接器能找到所使用的库
     vcpkg_backup_env_variables(VARS PATH LD_LIBRARY_PATH CL _CL_)
 
-    # This fixes issues on machines with default codepages that are not ASCII compatible, such as some CJK encodings
+    # 这修复了默认代码页与 ASCII 不兼容的机器上的问题，例如某些 CJK 编码
     set(ENV{_CL_} "/utf-8")
 
     if(CMAKE_HOST_WIN32)
@@ -63,7 +63,7 @@ function(vcpkg_build_qmake)
 
         vcpkg_add_to_path(PREPEND "${current_installed_prefix}/lib" "${current_installed_prefix}/bin")
 
-        # We set LD_LIBRARY_PATH ENV variable to allow executing Qt tools (rcc,...) even with dynamic linking
+        # 我们设置 LD_LIBRARY_PATH 环境变量，以允许即使在动态链接的情况下也能执行 Qt 工具 (rcc,...)
         if(CMAKE_HOST_UNIX)
             set(ENV{LD_LIBRARY_PATH} "")
             vcpkg_host_path_list(APPEND ENV{LD_LIBRARY_PATH} "${current_installed_prefix}/lib" "${current_installed_prefix}/lib/manual-link")

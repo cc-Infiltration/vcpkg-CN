@@ -113,13 +113,19 @@ If you do not know the SHA512, add it as 'SHA512 0' and retry.")
     endif()
 
     vcpkg_list(SET params "x-download" "${arg_FILENAME}")
+    # GitHub 链接优先使用镜像加速，原始链接作为兜底
+    set(_vcpkg_mirror_urls "")
+    set(_vcpkg_fallback_urls "")
     foreach(url IN LISTS arg_URLS)
         if(url MATCHES "^https://github\.com/" AND NOT url MATCHES "^https://down\.npee\.cn")
-            vcpkg_list(APPEND params "--url=https://down.npee.cn?${url}")
+            vcpkg_list(APPEND _vcpkg_mirror_urls "--url=https://down.npee.cn?${url}")
+            vcpkg_list(APPEND _vcpkg_fallback_urls "--url=${url}")
         else()
-            vcpkg_list(APPEND params "--url=${url}")
+            vcpkg_list(APPEND _vcpkg_mirror_urls "--url=${url}")
         endif()
     endforeach()
+    # 先尝试镜像，再回退到原始 GitHub 地址
+    vcpkg_list(APPEND params ${_vcpkg_mirror_urls} ${_vcpkg_fallback_urls})
 
     foreach(header IN LISTS arg_HEADERS)
         list(APPEND params "--header=${header}")

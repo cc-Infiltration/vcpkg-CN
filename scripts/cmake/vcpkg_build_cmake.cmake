@@ -1,4 +1,4 @@
-function(vcpkg_build_cmake)
+﻿function(vcpkg_build_cmake)
     cmake_parse_arguments(PARSE_ARGV 0 "arg"
         "DISABLE_PARALLEL;ADD_BIN_TO_PATH"
         "TARGET;LOGFILE_ROOT"
@@ -6,7 +6,7 @@ function(vcpkg_build_cmake)
     )
 
     if(Z_VCPKG_CMAKE_BUILD_GUARD)
-        message(FATAL_ERROR "The ${PORT} port already depends on vcpkg-cmake; using both vcpkg-cmake and vcpkg_build_cmake in the same port is unsupported.")
+        message(FATAL_ERROR "${PORT} 端口已依赖 vcpkg-cmake；不支持在同一端口中同时使用 vcpkg-cmake 和 vcpkg_build_cmake。")
     endif()
 
     if(NOT DEFINED arg_LOGFILE_ROOT)
@@ -18,7 +18,7 @@ function(vcpkg_build_cmake)
     vcpkg_list(SET no_parallel_param)
 
     if("${Z_VCPKG_CMAKE_GENERATOR}" STREQUAL "Ninja")
-        vcpkg_list(SET build_param "-v") # verbose output
+        vcpkg_list(SET build_param "-v") # 详细输出
         vcpkg_list(SET parallel_param "-j${VCPKG_CONCURRENCY}")
         vcpkg_list(SET no_parallel_param "-j1")
     elseif("${Z_VCPKG_CMAKE_GENERATOR}" MATCHES "^Visual Studio")
@@ -28,7 +28,7 @@ function(vcpkg_build_cmake)
         )
         vcpkg_list(SET parallel_param "/m")
     elseif("${Z_VCPKG_CMAKE_GENERATOR}" STREQUAL "NMake Makefiles")
-        # No options are currently added for nmake builds
+        # 当前没有为 nmake 构建添加任何选项
     elseif(Z_VCPKG_CMAKE_GENERATOR STREQUAL "Unix Makefiles")
         vcpkg_list(SET build_param "VERBOSE=1")
         vcpkg_list(SET parallel_param "-j${VCPKG_CONCURRENCY}")
@@ -37,7 +37,7 @@ function(vcpkg_build_cmake)
         vcpkg_list(SET parallel_param -jobs "${VCPKG_CONCURRENCY}")
         vcpkg_list(SET no_parallel_param -jobs 1)
     else()
-        message(FATAL_ERROR "Unrecognized GENERATOR setting from vcpkg_configure_cmake(). Valid generators are: Ninja, Visual Studio, and NMake Makefiles")
+        message(FATAL_ERROR "无法识别 vcpkg_configure_cmake() 的 GENERATOR 设置。有效的生成器为: Ninja、Visual Studio 和 NMake Makefiles")
     endif()
 
     vcpkg_list(SET target_param)
@@ -55,7 +55,7 @@ function(vcpkg_build_cmake)
                 set(config "Release")
             endif()
 
-            message(STATUS "Building ${TARGET_TRIPLET}-${short_build_type}")
+            message(STATUS "正在构建 ${TARGET_TRIPLET}-${short_build_type}")
 
             if(arg_ADD_BIN_TO_PATH)
                 vcpkg_backup_env_variables(VARS PATH)

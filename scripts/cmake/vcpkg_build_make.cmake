@@ -1,8 +1,8 @@
-function(vcpkg_build_make)
+﻿function(vcpkg_build_make)
     z_vcpkg_get_cmake_vars(cmake_vars_file)
     include("${cmake_vars_file}")
 
-    # parse parameters such that semicolons in options arguments to COMMAND don't get erased
+    # 解析参数，使得 COMMAND 选项参数中的分号不会被擦除
     cmake_parse_arguments(PARSE_ARGV 0 arg
         "ADD_BIN_TO_PATH;ENABLE_INSTALL;DISABLE_PARALLEL"
         "LOGFILE_ROOT;BUILD_TARGET;SUBPATH;MAKEFILE;INSTALL_TARGET"
@@ -10,7 +10,7 @@ function(vcpkg_build_make)
     )
 
     if(DEFINED arg_UNPARSED_ARGUMENTS)
-        message(WARNING "vcpkg_make_build was passed extra arguments: ${arg_UNPARSED_ARGUMENTS}")
+        message(WARNING "vcpkg_make_build 收到了多余参数: ${arg_UNPARSED_ARGUMENTS}")
     endif()
 
     if(NOT DEFINED arg_LOGFILE_ROOT)
@@ -52,7 +52,7 @@ function(vcpkg_build_make)
         string(REGEX REPLACE [[([a-zA-Z]):/]] [[/\1/]] vcpkg_package_prefix "${vcpkg_package_prefix}")
         vcpkg_list(SET install_opts -j ${VCPKG_CONCURRENCY} --trace -f ${arg_MAKEFILE} ${arg_INSTALL_TARGET} DESTDIR=${vcpkg_package_prefix})
         vcpkg_list(SET no_parallel_install_opts -j 1 --trace -f ${arg_MAKEFILE} ${arg_INSTALL_TARGET} DESTDIR=${vcpkg_package_prefix})
-        #TODO: optimize for install-data (release) and install-exec (release/debug)
+        #TODO: 针对 install-data (release) 和 install-exec (release/debug) 进行优化
 
     else()
         if(VCPKG_HOST_IS_FREEBSD OR VCPKG_HOST_IS_OPENBSD)
@@ -67,7 +67,7 @@ function(vcpkg_build_make)
         vcpkg_list(SET no_parallel_install_opts -j 1 -f ${arg_MAKEFILE} ${arg_INSTALL_TARGET} DESTDIR=${CURRENT_PACKAGES_DIR})
     endif()
 
-    # Since includes are buildtype independent those are setup by vcpkg_configure_make
+    # 由于头文件包含与构建类型无关，它们由 vcpkg_configure_make 设置
     vcpkg_backup_env_variables(VARS LIB LIBPATH LIBRARY_PATH LD_LIBRARY_PATH CPPFLAGS CFLAGS CXXFLAGS RCFLAGS)
 
     z_vcpkg_configure_make_common_definitions()
@@ -82,10 +82,10 @@ function(vcpkg_build_make)
             set(path_suffix "${path_suffix_${cmake_buildtype}}")
 
             set(working_directory "${CURRENT_BUILDTREES_DIR}/${TARGET_TRIPLET}-${short_buildtype}/${arg_SUBPATH}")
-            message(STATUS "Building ${TARGET_TRIPLET}-${short_buildtype}")
+            message(STATUS "正在构建 ${TARGET_TRIPLET}-${short_buildtype}")
 
             if("libtool-link-pass-target" IN_LIST VCPKG_BUILD_MAKE_FIXUP)
-                # Pass --target to the linker, e.g. for Android
+                # 将 --target 传递给链接器，例如用于 Android
                 file(GLOB_RECURSE libtool_files "${working_directory}/libtool")
                 foreach(file IN LISTS libtool_files)
                     vcpkg_replace_string("${file}" [[-xtarget=*|]] [[-xtarget=*|--target=*|]])
@@ -94,7 +94,7 @@ function(vcpkg_build_make)
 
             z_vcpkg_configure_make_process_flags("${cmake_buildtype}")
 
-            # Setup environment
+            # 设置环境
             set(ENV{CPPFLAGS} "${CPPFLAGS_${cmake_buildtype}}")
             set(ENV{CFLAGS} "${CFLAGS_${cmake_buildtype}}")
             set(ENV{CXXFLAGS} "${CXXFLAGS_${cmake_buildtype}}")
@@ -143,11 +143,11 @@ function(vcpkg_build_make)
 
             file(READ "${CURRENT_BUILDTREES_DIR}/${arg_LOGFILE_ROOT}-${TARGET_TRIPLET}-${short_buildtype}-out.log" logdata) 
             if(logdata MATCHES "Warning: linker path does not have real file for library")
-                message(FATAL_ERROR "libtool could not find a file being linked against!")
+                message(FATAL_ERROR "libtool 找不到正在链接的文件！")
             endif()
 
             if (arg_ENABLE_INSTALL)
-                message(STATUS "Installing ${TARGET_TRIPLET}-${short_buildtype}")
+                message(STATUS "正在安装 ${TARGET_TRIPLET}-${short_buildtype}")
                 vcpkg_list(SET make_cmd_line ${make_command} ${install_opts})
                 vcpkg_list(SET no_parallel_make_cmd_line ${make_command} ${no_parallel_install_opts})
                 vcpkg_execute_build_process(
@@ -178,7 +178,7 @@ function(vcpkg_build_make)
         file(REMOVE_RECURSE "${CURRENT_PACKAGES_DIR}_tmp")
     endif()
 
-    # Remove libtool files since they contain absolute paths and are not necessary. 
+    # 移除 libtool 文件，因为它们包含绝对路径且不是必需的。
     file(GLOB_RECURSE libtool_files "${CURRENT_PACKAGES_DIR}/**/*.la")
     if(libtool_files)
         file(REMOVE ${libtool_files})

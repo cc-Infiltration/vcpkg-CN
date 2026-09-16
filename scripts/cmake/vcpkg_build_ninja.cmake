@@ -1,5 +1,5 @@
-function(z_vcpkg_build_ninja_build config targets)
-    message(STATUS "Building (${config})...")
+﻿function(z_vcpkg_build_ninja_build config targets)
+    message(STATUS "正在构建 (${config})...")
     vcpkg_execute_build_process(
         COMMAND "${NINJA}" -C "${CURRENT_BUILDTREES_DIR}/${config}" ${targets}
         WORKING_DIRECTORY "${SOURCE_PATH}"
@@ -12,7 +12,7 @@ function(vcpkg_build_ninja)
     cmake_parse_arguments(PARSE_ARGV 0 arg "" "" "TARGETS")
 
     if(DEFINED arg_UNPARSED_ARGUMENTS)
-        message(WARNING "${CMAKE_CURRENT_FUNCTION} was passed extra arguments: ${arg_UNPARSED_ARGUMENTS}")
+        message(WARNING "${CMAKE_CURRENT_FUNCTION} 收到了多余参数: ${arg_UNPARSED_ARGUMENTS}")
     endif()
     if(NOT DEFINED arg_TARGETS)
         set(arg_TARGETS "")

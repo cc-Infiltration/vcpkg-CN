@@ -1,4 +1,4 @@
-function(vcpkg_build_msbuild)
+﻿function(vcpkg_build_msbuild)
     cmake_parse_arguments(
         PARSE_ARGV 0
         arg
@@ -8,7 +8,7 @@ function(vcpkg_build_msbuild)
     )
 
     if(DEFINED arg_UNPARSED_ARGUMENTS)
-        message(WARNING "vcpkg_build_msbuild was passed extra arguments: ${arg_UNPARSED_ARGUMENTS}")
+        message(WARNING "vcpkg_build_msbuild 收到了多余参数: ${arg_UNPARSED_ARGUMENTS}")
     endif()
 
     if(NOT DEFINED arg_RELEASE_CONFIGURATION)
@@ -43,8 +43,8 @@ function(vcpkg_build_msbuild)
     )
 
     if(VCPKG_LIBRARY_LINKAGE STREQUAL "static")
-        # Disable LTCG for static libraries because this setting introduces ABI incompatibility between minor compiler versions
-        # TODO: Add a way for the user to override this if they want to opt-in to incompatibility
+        # 对静态库禁用 LTCG，因为此设置会在次版本编译器之间引入 ABI 不兼容
+        # TODO: 添加一种方式，让用户在想要选择不兼容时可以覆盖此设置
         list(APPEND arg_OPTIONS "/p:WholeProgramOptimization=false")
     endif()
 
@@ -60,7 +60,7 @@ function(vcpkg_build_msbuild)
     endif()
 
     if(NOT DEFINED VCPKG_BUILD_TYPE OR VCPKG_BUILD_TYPE STREQUAL "release")
-        message(STATUS "Building ${arg_PROJECT_PATH} for Release")
+        message(STATUS "正在为 Release 构建 ${arg_PROJECT_PATH}")
         file(MAKE_DIRECTORY "${CURRENT_BUILDTREES_DIR}/${TARGET_TRIPLET}-rel")
         vcpkg_execute_required_process(
             COMMAND msbuild "${arg_PROJECT_PATH}"
@@ -73,7 +73,7 @@ function(vcpkg_build_msbuild)
     endif()
 
     if(NOT DEFINED VCPKG_BUILD_TYPE OR VCPKG_BUILD_TYPE STREQUAL "debug")
-        message(STATUS "Building ${arg_PROJECT_PATH} for Debug")
+        message(STATUS "正在为 Debug 构建 ${arg_PROJECT_PATH}")
         file(MAKE_DIRECTORY "${CURRENT_BUILDTREES_DIR}/${TARGET_TRIPLET}-dbg")
         vcpkg_execute_required_process(
             COMMAND msbuild "${arg_PROJECT_PATH}"
