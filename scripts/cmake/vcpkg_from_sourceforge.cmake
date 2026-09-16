@@ -1,4 +1,4 @@
-function(vcpkg_from_sourceforge)
+﻿function(vcpkg_from_sourceforge)
     cmake_parse_arguments(PARSE_ARGV 0 "arg"
         "DISABLE_SSL;NO_REMOVE_ONE_LEVEL"
         "OUT_SOURCE_PATH;REPO;REF;SHA512;FILENAME;WORKING_DIRECTORY"
@@ -6,16 +6,16 @@ function(vcpkg_from_sourceforge)
 
     foreach(arg_name IN ITEMS OUT_SOURCE_PATH SHA512 REPO FILENAME)
         if(NOT DEFINED "arg_${arg_name}")
-            message(FATAL_ERROR "${arg_name} is required.")
+            message(FATAL_ERROR "${arg_name} 是必需的。")
         endif()
     endforeach()
 
     if(arg_DISABLE_SSL)
-        message(WARNING "DISABLE_SSL has been deprecated and has no effect")
+        message(WARNING "DISABLE_SSL 已被弃用且无效")
     endif()
 
     if(DEFINED arg_UNPARSED_ARGUMENTS)
-        message(FATAL_ERROR "Unrecognized arguments: ${arg_UNPARSED_ARGUMENTS}")
+        message(FATAL_ERROR "无法识别的参数: ${arg_UNPARSED_ARGUMENTS}")
     endif()
 
     vcpkg_download_sourceforge(ARCHIVE

@@ -1,9 +1,9 @@
-set(program_name clang)
+﻿set(program_name clang)
 set(tool_subdirectory "clang-15.0.6")
 set(program_version 15.0.6)
 if(CMAKE_HOST_WIN32)
     set(paths_to_search
-        # Support LLVM in Visual Studio 2019
+        # 支持 Visual Studio 2019 中的 LLVM
         "$ENV{LLVMInstallDir}/x64/bin"
         "$ENV{LLVMInstallDir}/bin"
         "$ENV{VCINSTALLDIR}/Tools/Llvm/x64/bin"

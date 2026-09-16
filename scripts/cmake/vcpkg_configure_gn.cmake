@@ -1,10 +1,10 @@
 function(z_vcpkg_configure_gn_generate)
     cmake_parse_arguments(PARSE_ARGV 0 "arg" "" "SOURCE_PATH;CONFIG;ARGS" "")
     if(DEFINED arg_UNPARSED_ARGUMENTS)
-        message(FATAL_ERROR "Internal error: generate was passed extra arguments: ${arg_UNPARSED_ARGUMENTS}")
+        message(FATAL_ERROR "内部错误: generate 被传递了多余的参数: ${arg_UNPARSED_ARGUMENTS}")
     endif()
 
-    message(STATUS "Generating build (${arg_CONFIG})...")
+    message(STATUS "正在生成构建 (${arg_CONFIG})...")
     file(REMOVE_RECURSE "${CURRENT_BUILDTREES_DIR}/${arg_CONFIG}")
     vcpkg_execute_required_process(
         COMMAND "${GN}" gen "${CURRENT_BUILDTREES_DIR}/${arg_CONFIG}" "${arg_ARGS}"
@@ -15,17 +15,17 @@ endfunction()
 
 function(vcpkg_configure_gn)
     if(Z_VCPKG_GN_CONFIGURE_GUARD)
-        message(FATAL_ERROR "The ${PORT} port already depends on vcpkg-gn; using both vcpkg-gn and vcpkg_configure_gn in the same port is unsupported.")
+        message(FATAL_ERROR "${PORT} 端口已依赖于 vcpkg-gn；在同一端口中同时使用 vcpkg-gn 和 vcpkg_configure_gn 不受支持。")
     else()
-        message("${Z_VCPKG_BACKCOMPAT_MESSAGE_LEVEL}" "This function 'vcpkg_configure_gn' is obsolete. Use 'vcpkg_gn_configure' in port 'vcpkg-gn'.")
+        message("${Z_VCPKG_BACKCOMPAT_MESSAGE_LEVEL}" "此函数 'vcpkg_configure_gn' 已过时。请使用 'vcpkg-gn' 端口中的 'vcpkg_gn_configure'。")
     endif()
 
     cmake_parse_arguments(PARSE_ARGV 0 "arg" "" "SOURCE_PATH;OPTIONS;OPTIONS_DEBUG;OPTIONS_RELEASE" "")
     if(DEFINED arg_UNPARSED_ARGUMENTS)
-        message(WARNING "vcpkg_configure_gn was passed extra arguments: ${arg_UNPARSED_ARGUMENTS}")
+        message(WARNING "vcpkg_configure_gn 被传递了多余的参数: ${arg_UNPARSED_ARGUMENTS}")
     endif()
     if(NOT DEFINED arg_SOURCE_PATH)
-        message(FATAL_ERROR "SOURCE_PATH must be specified.")
+        message(FATAL_ERROR "必须指定 SOURCE_PATH。")
     endif()
 
     vcpkg_find_acquire_program(PYTHON3)

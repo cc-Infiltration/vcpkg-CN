@@ -1,4 +1,4 @@
-function(vcpkg_from_git)
+﻿function(vcpkg_from_git)
     cmake_parse_arguments(PARSE_ARGV 0 "arg"
         ""
         "OUT_SOURCE_PATH;URL;REF;FETCH_REF;HEAD_REF;TAG;LFS"
@@ -6,23 +6,23 @@ function(vcpkg_from_git)
     )
 
     if(DEFINED arg_UNPARSED_ARGUMENTS)
-        message(WARNING "vcpkg_from_git was passed extra arguments: ${arg_UNPARSED_ARGUMENTS}")
+        message(WARNING "vcpkg_from_git 被传递了多余的参数: ${arg_UNPARSED_ARGUMENTS}")
     endif()
     if(DEFINED arg_TAG)
-        message(WARNING "The TAG argument to vcpkg_from_git has been deprecated and has no effect.")
+        message(WARNING "vcpkg_from_git 的 TAG 参数已被弃用且无效。")
     endif()
 
     if(NOT DEFINED arg_OUT_SOURCE_PATH)
-        message(FATAL_ERROR "OUT_SOURCE_PATH must be specified")
+        message(FATAL_ERROR "必须指定 OUT_SOURCE_PATH")
     endif()
     if(NOT DEFINED arg_URL)
-        message(FATAL_ERROR "URL must be specified")
+        message(FATAL_ERROR "必须指定 URL")
     endif()
     if(NOT DEFINED arg_REF AND NOT DEFINED arg_HEAD_REF)
-        message(FATAL_ERROR "At least one of REF or HEAD_REF must be specified")
+        message(FATAL_ERROR "必须指定 REF 或 HEAD_REF 中的至少一个")
     endif()
     if(DEFINED arg_FETCH_REF AND NOT DEFINED arg_REF)
-        message(FATAL_ERROR "REF must be specified if FETCH_REF is specified")
+        message(FATAL_ERROR "如果指定了 FETCH_REF，则必须指定 REF")
     endif()
     if(DEFINED arg_LFS AND arg_LFS STREQUAL "")
         set(arg_LFS "${arg_URL}")
@@ -47,10 +47,10 @@ function(vcpkg_from_git)
         endif()
     else()
         if(NOT DEFINED arg_REF)
-            message(FATAL_ERROR "Package does not specify REF. It must be built using --head.")
+            message(FATAL_ERROR "包未指定 REF。必须使用 --head 进行构建。")
         endif()
         if(VCPKG_USE_HEAD_VERSION)
-            message(STATUS "Package does not specify HEAD_REF. Falling back to non-HEAD version.")
+            message(STATUS "包未指定 HEAD_REF。回退到非 HEAD 版本。")
         endif()
 
         if(DEFINED arg_FETCH_REF)
@@ -67,16 +67,16 @@ function(vcpkg_from_git)
 
     if(NOT EXISTS "${archive}")
         if(_VCPKG_NO_DOWNLOADS)
-            message(FATAL_ERROR "Downloads are disabled, but '${archive}' does not exist.")
+            message(FATAL_ERROR "下载已禁用，但 '${archive}' 不存在。")
         endif()
         set(do_download ON)
     endif()
 
     if(do_download)
-        message(STATUS "Fetching ${arg_URL} ${ref_to_fetch}...")
+        message(STATUS "正在获取 ${arg_URL} ${ref_to_fetch}...")
         find_program(GIT NAMES git git.cmd)
         file(MAKE_DIRECTORY "${DOWNLOADS}")
-        # Note: git init is safe to run multiple times
+        # 注意: git init 可以安全地多次运行
         vcpkg_execute_required_process(
             ALLOW_IN_DOWNLOAD_MODE
             COMMAND "${GIT}" init "${git_working_directory}"
@@ -90,7 +90,7 @@ function(vcpkg_from_git)
             LOGNAME "git-fetch-${TARGET_TRIPLET}"
         )
         if(arg_LFS)
-            # Running "git lfs" searches for "git-lfs[.exe]" on the path
+            # 运行 "git lfs" 会在路径中搜索 "git-lfs[.exe]"
             vcpkg_execute_in_download_mode(
                 COMMAND "${GIT}" lfs --version
                 OUTPUT_VARIABLE lfs_version_output
@@ -99,7 +99,7 @@ function(vcpkg_from_git)
                 WORKING_DIRECTORY "${git_working_directory}"
             )
             if(lfs_version_result)
-                message(FATAL_ERROR "Git LFS is required for ${PORT}")
+                message(FATAL_ERROR "${PORT} 需要 Git LFS")
             endif()
 
             vcpkg_execute_required_process(
@@ -132,19 +132,19 @@ function(vcpkg_from_git)
 
         if(error_code)
             if(VCPKG_USE_HEAD_VERSION)
-                message(FATAL_ERROR "Unable to determine the commit SHA of the HEAD version to use after \
-fetching ${ref_to_fetch} from the git repository. (git rev-parse ${expected_rev_parse} failed)")
+                message(FATAL_ERROR "无法确定要使用的 HEAD 版本的提交 SHA，在从 git 仓库获取 \
+${ref_to_fetch} 之后。(git rev-parse ${expected_rev_parse} 失败)")
             elseif(DEFINED arg_FETCH_REF)
-                message(FATAL_ERROR "After fetching ${ref_to_fetch}, the target ref ${expected_rev_parse} appears \
-inaccessible. A common cause of this failure is setting REF to a named branch or tag rather than a commit SHA. REF \
-must be a commit SHA. (git rev-parse ${expected_rev_parse} failed)")
+                message(FATAL_ERROR "获取 ${ref_to_fetch} 后，目标 ref ${expected_rev_parse} 似乎\
+不可访问。此失败的常见原因是将 REF 设置为命名分支或标签而非提交 SHA。REF \
+必须是提交 SHA。(git rev-parse ${expected_rev_parse} 失败)")
             else()
-                message(FATAL_ERROR "After fetching ${ref_to_fetch}, the target ref ${expected_rev_parse} appears \
-inaccessible. A common cause of this failure is setting REF to a named branch or tag rather than a commit SHA. REF \
-must be a commit SHA. If the git server does not advertise commit SHAs \
-(uploadpack.allowReachableSHA1InWant is false), you can set FETCH_REF to a named branch in which the desired commit \
-SHA is in the history. For example, you may be able to fix this error by changing \"REF ${arg_REF}\" to \
-\"REF a-commit-sha FETCH_REF ${arg_REF}\". (git rev-parse ${expected_rev_parse} failed)")
+                message(FATAL_ERROR "获取 ${ref_to_fetch} 后，目标 ref ${expected_rev_parse} 似乎\
+不可访问。此失败的常见原因是将 REF 设置为命名分支或标签而非提交 SHA。REF \
+必须是提交 SHA。如果 git 服务器不公布提交 SHA \
+(uploadpack.allowReachableSHA1InWant 为 false)，你可以将 FETCH_REF 设置为一个包含所需提交 \
+SHA 历史记录的命名分支。例如，你可以通过将 \"REF ${arg_REF}\" 更改为 \
+\"REF a-commit-sha FETCH_REF ${arg_REF}\" 来修复此错误。(git rev-parse ${expected_rev_parse} 失败)")
             endif()
         endif()
 
@@ -152,14 +152,14 @@ SHA is in the history. For example, you may be able to fix this error by changin
         if(VCPKG_USE_HEAD_VERSION)
             set(VCPKG_HEAD_VERSION "${rev_parse_ref}" PARENT_SCOPE)
         elseif(NOT "${rev_parse_ref}" STREQUAL "${arg_REF}")
-                message(FATAL_ERROR "After fetching ${ref_to_fetch}, the requested REF (${arg_REF}) does not match \
-its commit SHA returned by git rev-parse (${rev_parse_ref}). This is usually caused by trying to set REF to a named \
-branch or tag rather than a commit SHA. REF must be a commit SHA. If the  git server does not advertise commit SHAs \
-(uploadpack.allowReachableSHA1InWant is false), you can set FETCH_REF to a named branch in which the desired commit \
-SHA is in the history. For example, you may be able to fix this error by changing \"REF ${arg_REF}\" to \
-\"REF a-commit-sha FETCH_REF ${arg_REF}\".
-    [Expected : ( ${arg_REF} )])
-    [  Actual : ( ${rev_parse_ref} )]"
+                message(FATAL_ERROR "获取 ${ref_to_fetch} 后，请求的 REF (${arg_REF}) 与 git rev-parse 返回的\
+提交 SHA (${rev_parse_ref}) 不匹配。这通常是因为尝试将 REF 设置为命名\
+分支或标签而非提交 SHA。REF 必须是提交 SHA。如果 git 服务器不公布提交 SHA \
+(uploadpack.allowReachableSHA1InWant 为 false)，你可以将 FETCH_REF 设置为一个包含所需提交 \
+SHA 历史记录的命名分支。例如，你可以通过将 \"REF ${arg_REF}\" 更改为 \
+\"REF a-commit-sha FETCH_REF ${arg_REF}\" 来修复此错误。
+    [期望值 : ( ${arg_REF} )])
+    [  实际值 : ( ${rev_parse_ref} )]"
             )
         endif()
 
@@ -172,7 +172,7 @@ SHA is in the history. For example, you may be able to fix this error by changin
         )
         file(RENAME "${temp_archive}" "${archive}")
     else()
-        message(STATUS "Using cached ${archive}")
+        message(STATUS "使用缓存的 ${archive}")
     endif()
 
     vcpkg_extract_source_archive_ex(

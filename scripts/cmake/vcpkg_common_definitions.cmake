@@ -1,5 +1,5 @@
-string(COMPARE NOTEQUAL "${TARGET_TRIPLET}" "${HOST_TRIPLET}" VCPKG_CROSSCOMPILING)
-#Helper variable to identify the Target system. VCPKG_TARGET_IS_<targetname>
+﻿string(COMPARE NOTEQUAL "${TARGET_TRIPLET}" "${HOST_TRIPLET}" VCPKG_CROSSCOMPILING)
+#用于识别目标系统的辅助变量。VCPKG_TARGET_IS_<targetname>
 if (NOT DEFINED VCPKG_CMAKE_SYSTEM_NAME OR VCPKG_CMAKE_SYSTEM_NAME STREQUAL "")
     set(VCPKG_TARGET_IS_WINDOWS ON)
 
@@ -48,7 +48,7 @@ elseif(VCPKG_CMAKE_SYSTEM_NAME STREQUAL "Emscripten")
     set(VCPKG_TARGET_IS_EMSCRIPTEN ON)
 endif()
 
-#Helper variables to identify the host system name
+#用于识别宿主系统名称的辅助变量
 if (CMAKE_HOST_WIN32)
     set(VCPKG_HOST_IS_WINDOWS ON)
 elseif (CMAKE_HOST_SYSTEM_NAME STREQUAL "Darwin")
@@ -68,20 +68,20 @@ elseif(CMAKE_HOST_SYSTEM_NAME STREQUAL "SunOS")
     set(VCPKG_HOST_IS_SOLARIS ON)
 endif()
 
-#Helper variable to identify the host path separator.
+#用于识别宿主路径分隔符的辅助变量
 if(CMAKE_HOST_WIN32)
     set(VCPKG_HOST_PATH_SEPARATOR ";")
 elseif(CMAKE_HOST_UNIX)
     set(VCPKG_HOST_PATH_SEPARATOR ":")
 endif()
 
-#Helper variables to identify executables on host/target
+#用于识别宿主/目标可执行文件的辅助变量
 if(CMAKE_HOST_WIN32)
     set(VCPKG_HOST_EXECUTABLE_SUFFIX ".exe")
 else()
     set(VCPKG_HOST_EXECUTABLE_SUFFIX "")
 endif()
-#set(CMAKE_EXECUTABLE_SUFFIX ${VCPKG_HOST_EXECUTABLE_SUFFIX}) not required by find_program
+#set(CMAKE_EXECUTABLE_SUFFIX ${VCPKG_HOST_EXECUTABLE_SUFFIX}) find_program 不需要此项
 
 if(VCPKG_TARGET_IS_WINDOWS)
     set(VCPKG_TARGET_EXECUTABLE_SUFFIX ".exe")
@@ -89,7 +89,7 @@ else()
     set(VCPKG_TARGET_EXECUTABLE_SUFFIX "")
 endif()
 
-#Helper variables to identify bundles on host/target
+#用于识别宿主/目标 bundle 的辅助变量
 if(VCPKG_HOST_IS_OSX)
     set(VCPKG_HOST_BUNDLE_SUFFIX ".app")
 else()
@@ -102,7 +102,7 @@ else()
     set(VCPKG_TARGET_BUNDLE_SUFFIX "")
 endif()
 
-#Helper variables for libraries
+#库相关的辅助变量
 if(VCPKG_TARGET_IS_MINGW)
     set(VCPKG_TARGET_STATIC_LIBRARY_SUFFIX ".a")
     set(VCPKG_TARGET_IMPORT_LIBRARY_SUFFIX ".dll.a")
@@ -120,8 +120,8 @@ elseif(VCPKG_TARGET_IS_WINDOWS)
     set(VCPKG_TARGET_STATIC_LIBRARY_PREFIX "")
     set(VCPKG_TARGET_SHARED_LIBRARY_PREFIX "")
     set(VCPKG_TARGET_IMPORT_LIBRARY_PREFIX "")
-    set(VCPKG_FIND_LIBRARY_SUFFIXES ".lib" ".dll") #This is a slight modification to CMakes value which does not include ".dll".
-    set(VCPKG_FIND_LIBRARY_PREFIXES "" "lib") #This is a slight modification to CMakes value which does not include "lib".
+    set(VCPKG_FIND_LIBRARY_SUFFIXES ".lib" ".dll") #这是对 CMake 值的轻微修改，原值不包含 ".dll"。
+    set(VCPKG_FIND_LIBRARY_PREFIXES "" "lib") #这是对 CMake 值的轻微修改，原值不包含 "lib"。
 elseif(VCPKG_TARGET_IS_APPLE)
     set(VCPKG_TARGET_STATIC_LIBRARY_SUFFIX ".a")
     set(VCPKG_TARGET_IMPORT_LIBRARY_SUFFIX "")
@@ -139,8 +139,8 @@ else()
     set(VCPKG_FIND_LIBRARY_SUFFIXES ".so" ".a")
     set(VCPKG_FIND_LIBRARY_PREFIXES "lib" "")
 endif()
-#Setting these variables allows find_library to work in script mode and thus in portfiles!
-#This allows us scale down on hardcoded target dependent paths in portfiles
+#设置这些变量使得 find_library 可以在脚本模式下工作，从而可用于 portfile！
+#这使我们能够减少 portfile 中硬编码的、与目标相关的路径
 set(CMAKE_STATIC_LIBRARY_SUFFIX "${VCPKG_TARGET_STATIC_LIBRARY_SUFFIX}")
 set(CMAKE_SHARED_LIBRARY_SUFFIX "${VCPKG_TARGET_SHARED_LIBRARY_SUFFIX}")
 set(CMAKE_IMPORT_LIBRARY_SUFFIX "${VCPKG_TARGET_IMPORT_LIBRARY_SUFFIX}")
@@ -148,59 +148,59 @@ set(CMAKE_STATIC_LIBRARY_PREFIX "${VCPKG_TARGET_STATIC_LIBRARY_PREFIX}")
 set(CMAKE_SHARED_LIBRARY_PREFIX "${VCPKG_TARGET_SHARED_LIBRARY_PREFIX}")
 set(CMAKE_IMPORT_LIBRARY_PREFIX "${VCPKG_TARGET_IMPORT_LIBRARY_PREFIX}")
 
-set(CMAKE_FIND_LIBRARY_SUFFIXES "${VCPKG_FIND_LIBRARY_SUFFIXES}" CACHE INTERNAL "") # Required by find_library
-set(CMAKE_FIND_LIBRARY_PREFIXES "${VCPKG_FIND_LIBRARY_PREFIXES}" CACHE INTERNAL "") # Required by find_library
+set(CMAKE_FIND_LIBRARY_SUFFIXES "${VCPKG_FIND_LIBRARY_SUFFIXES}" CACHE INTERNAL "") # find_library 需要
+set(CMAKE_FIND_LIBRARY_PREFIXES "${VCPKG_FIND_LIBRARY_PREFIXES}" CACHE INTERNAL "") # find_library 需要
 
-# Append platform libraries to VCPKG_SYSTEM_LIBRARIES
-# The variable are just appended to permit to custom triplets define the variable
+# 将平台库追加到 VCPKG_SYSTEM_LIBRARIES
+# 这些变量只是被追加，以允许自定义三元组定义该变量
 
-# Platforms with libdl
+# 包含 libdl 的平台
 if(VCPKG_TARGET_IS_LINUX OR VCPKG_TARGET_IS_ANDROID OR VCPKG_TARGET_IS_OHOS OR VCPKG_TARGET_IS_OSX)
     list(APPEND VCPKG_SYSTEM_LIBRARIES dl)
 endif()
 
-# Platforms with libm
+# 包含 libm 的平台
 if(VCPKG_TARGET_IS_LINUX OR VCPKG_TARGET_IS_ANDROID OR VCPKG_TARGET_IS_OHOS OR VCPKG_TARGET_IS_FREEBSD OR VCPKG_TARGET_IS_OPENBSD OR VCPKG_TARGET_IS_OSX OR VCPKG_TARGET_IS_MINGW)
     list(APPEND VCPKG_SYSTEM_LIBRARIES m)
 endif()
 
-# Platforms with pthread
+# 包含 pthread 的平台
 if(VCPKG_TARGET_IS_LINUX OR VCPKG_TARGET_IS_ANDROID OR VCPKG_TARGET_IS_OHOS OR VCPKG_TARGET_IS_OSX OR VCPKG_TARGET_IS_FREEBSD OR VCPKG_TARGET_IS_OPENBSD OR VCPKG_TARGET_IS_MINGW)
     list(APPEND VCPKG_SYSTEM_LIBRARIES pthread)
 endif()
 
-# Platforms with libstdc++
+# 包含 libstdc++ 的平台
 if(VCPKG_TARGET_IS_LINUX OR VCPKG_TARGET_IS_ANDROID OR VCPKG_TARGET_IS_FREEBSD OR VCPKG_TARGET_IS_OPENBSD OR VCPKG_TARGET_IS_MINGW)
     list(APPEND VCPKG_SYSTEM_LIBRARIES [[stdc\+\+]])
 endif()
 
-# Platforms with libc++
+# 包含 libc++ 的平台
 if(VCPKG_TARGET_IS_OSX)
     list(APPEND VCPKG_SYSTEM_LIBRARIES [[c\+\+]])
 endif()
 
-# Platforms with libc++ (non-Apple)
+# 包含 libc++ 的平台（非 Apple）
 if(VCPKG_TARGET_IS_OHOS)
     list(APPEND VCPKG_SYSTEM_LIBRARIES [[c\+\+]])
 endif()
 
-# Platforms with librt
+# 包含 librt 的平台
 if(VCPKG_TARGET_IS_LINUX OR VCPKG_TARGET_IS_ANDROID OR VCPKG_TARGET_IS_OHOS OR VCPKG_TARGET_IS_OSX OR VCPKG_TARGET_IS_FREEBSD OR VCPKG_TARGET_IS_MINGW)
     list(APPEND VCPKG_SYSTEM_LIBRARIES rt)
 endif()
 
-# Platforms with GCC libs
+# 包含 GCC 库的平台
 if(VCPKG_TARGET_IS_LINUX OR VCPKG_TARGET_IS_ANDROID OR VCPKG_TARGET_IS_OHOS OR VCPKG_TARGET_IS_OSX OR VCPKG_TARGET_IS_FREEBSD OR VCPKG_TARGET_IS_OPENBSD OR VCPKG_TARGET_IS_MINGW)
     list(APPEND VCPKG_SYSTEM_LIBRARIES gcc)
     list(APPEND VCPKG_SYSTEM_LIBRARIES gcc_s)
 endif()
 
-# Platforms with system iconv
+# 包含系统 iconv 的平台
 if(VCPKG_TARGET_IS_OSX)
     list(APPEND VCPKG_SYSTEM_LIBRARIES iconv)
 endif()
 
-# Windows system libs
+# Windows 系统库
 if(VCPKG_TARGET_IS_WINDOWS)
     list(APPEND VCPKG_SYSTEM_LIBRARIES advapi32)
     list(APPEND VCPKG_SYSTEM_LIBRARIES bcrypt)

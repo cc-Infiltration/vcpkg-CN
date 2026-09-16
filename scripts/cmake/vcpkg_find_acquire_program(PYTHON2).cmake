@@ -1,9 +1,9 @@
-if(CMAKE_HOST_WIN32)
+﻿if(CMAKE_HOST_WIN32)
     set(program_name python)
     set(program_version 2.7.18)
     if(EXISTS "${CURRENT_HOST_INSTALLED_DIR}/share/vcpkg-tool-python2/details.cmake")
         include("${CURRENT_HOST_INSTALLED_DIR}/share/vcpkg-tool-python2/details.cmake")
-    else() # Old behavior
+    else() # 旧行为
         if (VCPKG_TARGET_ARCHITECTURE STREQUAL x86)
             set(tool_subdirectory "python-${program_version}-x86")
             set(download_urls "https://www.python.org/ftp/python/${program_version}/python-${program_version}.msi")
@@ -18,7 +18,7 @@ if(CMAKE_HOST_WIN32)
         set(paths_to_search "${DOWNLOADS}/tools/python/${tool_subdirectory}")
     endif()
 elseif(CMAKE_HOST_SYSTEM_NAME STREQUAL "Darwin")
-    # macOS includes Python 2.7 built-in as `python`
+    # macOS 内置了 Python 2.7，可通过 `python` 命令使用
     set(program_name python)
     set(brew_package_name "python2")
 else()

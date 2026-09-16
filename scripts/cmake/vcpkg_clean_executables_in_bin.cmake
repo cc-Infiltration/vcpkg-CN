@@ -1,10 +1,10 @@
-function(z_vcpkg_clean_executables_in_bin_remove_directory_if_empty directory)
+﻿function(z_vcpkg_clean_executables_in_bin_remove_directory_if_empty directory)
     if(NOT EXISTS "${directory}")
         return()
     endif()
 
     if(NOT IS_DIRECTORY "${directory}")
-        message(FATAL_ERROR "${directory} must be a directory")
+        message(FATAL_ERROR "${directory} 必须是一个目录")
     endif()
 
     file(GLOB items "${directory}/*")
@@ -18,11 +18,11 @@ function(vcpkg_clean_executables_in_bin)
     cmake_parse_arguments(PARSE_ARGV 0 arg "" "" "FILE_NAMES")
 
     if(NOT DEFINED arg_FILE_NAMES)
-        message(FATAL_ERROR "FILE_NAMES must be specified.")
+        message(FATAL_ERROR "必须指定 FILE_NAMES。")
     endif()
 
     if(DEFINED arg_UNPARSED_ARGUMENTS)
-        message(WARNING "${CMAKE_CURRENT_FUNCTION} was passed extra arguments: ${arg_UNPARSED_ARGUMENTS}")
+        message(WARNING "${CMAKE_CURRENT_FUNCTION} 传入了多余的参数：${arg_UNPARSED_ARGUMENTS}")
     endif()
 
 

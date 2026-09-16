@@ -1,4 +1,4 @@
-function(z_vcpkg_find_acquire_program_version_check out_var)
+﻿function(z_vcpkg_find_acquire_program_version_check out_var)
     cmake_parse_arguments(PARSE_ARGV 1 arg
         "EXACT_VERSION_MATCH"
         "MIN_VERSION;PROGRAM_NAME"
@@ -10,7 +10,7 @@ function(z_vcpkg_find_acquire_program_version_check out_var)
         OUTPUT_VARIABLE program_version_output
     )
     string(STRIP "${program_version_output}" program_version_output)
-    #TODO: REGEX MATCH case for more complex cases!
+    #TODO: 为更复杂的情况添加正则匹配！
     set(version_compare VERSION_GREATER_EQUAL)
     set(version_compare_msg "at least")
     if(arg_EXACT_VERSION_MATCH)
@@ -18,10 +18,10 @@ function(z_vcpkg_find_acquire_program_version_check out_var)
         set(version_compare_msg "exact")
     endif()
     if(NOT "${program_version_output}" ${version_compare} "${arg_MIN_VERSION}")
-        message(STATUS "Found ${arg_PROGRAM_NAME}('${program_version_output}') but ${version_compare_msg} version ${arg_MIN_VERSION} is required! Trying to use internal version if possible!")
+        message(STATUS "找到了 ${arg_PROGRAM_NAME}('${program_version_output}')，但需要${version_compare_msg}版本 ${arg_MIN_VERSION}！尝试尽可能使用内部版本！")
         set("${out_var}" OFF PARENT_SCOPE)
     else()
-        message(STATUS "Found external ${arg_PROGRAM_NAME}('${program_version_output}').")
+        message(STATUS "找到外部 ${arg_PROGRAM_NAME}('${program_version_output}')。")
         set("${out_var}" ON PARENT_SCOPE)
     endif()
 endfunction()
@@ -51,8 +51,8 @@ function(z_vcpkg_find_acquire_program_find_external program)
 
     set(${program} "$CACHE{${program}}")
     if("${version_command}" STREQUAL "")
-        set(version_is_good ON) # can't check for the version being good, so assume it is
-    elseif(${program}) # only do a version check if ${program} has a value
+        set(version_is_good ON) # 无法检查版本是否合适，所以假设它是合适的
+    elseif(${program}) # 仅当 ${program} 有值时才进行版本检查
         z_vcpkg_find_acquire_program_version_check(version_is_good
             ${arg_EXACT_VERSION_MATCH}
             COMMAND ${${program}} ${arg_VERSION_COMMAND}
@@ -146,11 +146,11 @@ function(vcpkg_find_acquire_program program)
           return()
         endif()
     else()
-        message(FATAL_ERROR "unknown tool ${program} -- unable to acquire.")
+        message(FATAL_ERROR "未知工具 ${program} -- 无法获取。")
     endif()
 
     if("${program_name}" STREQUAL "")
-        message(FATAL_ERROR "Internal error: failed to initialize program_name for program ${program}")
+        message(FATAL_ERROR "内部错误: 未能为程序 ${program} 初始化 program_name")
     endif()
 
     set(full_subdirectory "${DOWNLOADS}/tools/${program_name}/${tool_subdirectory}")
@@ -158,7 +158,7 @@ function(vcpkg_find_acquire_program program)
         list(APPEND paths_to_search ${full_subdirectory})
     endif()
     if("${full_subdirectory}" MATCHES [[^(.*)[/\\]+$]])
-        # remove trailing slashes, which may turn into a trailing `\` which CMake _does not like_
+        # 移除尾部斜杠，因为尾部斜杠可能变成尾部 `\`，CMake _不喜欢_ 这个
         set(full_subdirectory "${CMAKE_MATCH_1}")
     endif()
 
@@ -166,9 +166,9 @@ function(vcpkg_find_acquire_program program)
         set(search_names "${program_name}")
     endif()
 
-    # Force nested `find_program` to either use the cached variable or
-    # to actually search, regardless of a parent scope variable.
-    # Called functions must change the variable in this scope.
+    # 强制嵌套的 `find_program` 要么使用缓存变量，
+    # 要么实际搜索，不受父作用域变量的影响。
+    # 被调用的函数必须在此作用域中更改变量。
     if("$CACHE{${program}}" STREQUAL "")
         set(${program} "NOTFOUND")
     else()
@@ -199,7 +199,7 @@ function(vcpkg_find_acquire_program program)
             elseif(NOT "${apt_package_name}" STREQUAL "" AND VCPKG_HOST_IS_LINUX)
                 set(example ":\n    sudo apt-get install ${apt_package_name}")
             endif()
-            message(FATAL_ERROR "Could not find ${program_name}. Please install it via your package manager${example}")
+            message(FATAL_ERROR "找不到 ${program_name}。请通过包管理器安装${example}")
         endif()
 
         if("${sourceforge_args}" STREQUAL "")
@@ -236,10 +236,10 @@ function(vcpkg_find_acquire_program program)
                 )
             endif()
         elseif(tool_subdirectory STREQUAL "")
-            # The effective tool subdir is owned by the extracted paths of the archive.
-            # *** This behavior is provided for convenience and short paths. ***
-            # There must be no overlap between different providers of subdirs.
-            # Otherwise tool_subdirectory must be used in order to separate extracted trees.
+            # 有效的工具子目录由归档文件的解压路径所拥有。
+            # *** 提供此行为是为了方便和缩短路径。***
+            # 不同子目录提供者之间不能有重叠。
+            # 否则必须使用 tool_subdirectory 来分隔解压的目录树。
             file(REMOVE_RECURSE "${full_subdirectory}.temp")
             vcpkg_extract_archive(ARCHIVE "${archive_path}" DESTINATION "${full_subdirectory}.temp")
             file(COPY "${full_subdirectory}.temp/" DESTINATION "${full_subdirectory}")
@@ -264,7 +264,7 @@ function(vcpkg_find_acquire_program program)
             NAMES ${search_names}
         )
         if(NOT ${program})
-            message(FATAL_ERROR "Unable to find ${program}")
+            message(FATAL_ERROR "无法找到 ${program}")
         endif()
     endif()
 

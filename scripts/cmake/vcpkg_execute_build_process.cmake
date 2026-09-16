@@ -1,18 +1,18 @@
 set(Z_VCPKG_EXECUTE_BUILD_PROCESS_RETRY_ERROR_MESSAGES
     "LINK : fatal error LNK1102:"
     " fatal error C1060: "
-    # The linker ran out of memory during execution. We will try continuing once more, with parallelism disabled.
+    # 链接器在执行期间内存不足。我们将禁用并行后重试一次。
     "LINK : fatal error LNK1318:"
     "LINK : fatal error LNK1104:"
     "LINK : fatal error LNK1201:"
     "ld terminated with signal 9"
     "Killed signal terminated program"
-    # Multiple threads using the same directory at the same time cause conflicts, will try again.
+    # 多个线程同时使用同一目录会导致冲突，将重试。
     "Cannot create parent directory"
     "Cannot write file"
-    # Multiple threads caused the wrong order of creating folders and creating files in folders
+    # 多个线程导致创建文件夹和文件夹中创建文件的顺序错误
     "Can't open"
-    # `make install` may stumble over concurrency, in particular with `mkdir` on osx.
+    # `make install` 可能因并发而失败，特别是在 osx 上的 `mkdir`。
     "mkdir [^:]*: File exists"
 )
 list(JOIN Z_VCPKG_EXECUTE_BUILD_PROCESS_RETRY_ERROR_MESSAGES "|" Z_VCPKG_EXECUTE_BUILD_PROCESS_RETRY_ERROR_MESSAGES)
@@ -21,16 +21,16 @@ function(vcpkg_execute_build_process)
     cmake_parse_arguments(PARSE_ARGV 0 arg "" "WORKING_DIRECTORY;LOGNAME" "COMMAND;NO_PARALLEL_COMMAND")
 
     if(DEFINED arg_UNPARSED_ARGUMENTS)
-        message(WARNING "${CMAKE_CURRENT_FUNCTION} was passed extra arguments: ${arg_UNPARSED_ARGUMENTS}")
+        message(WARNING "${CMAKE_CURRENT_FUNCTION} 传入了多余的参数：${arg_UNPARSED_ARGUMENTS}")
     endif()
     foreach(required_arg IN ITEMS WORKING_DIRECTORY COMMAND)
         if(NOT DEFINED arg_${required_arg})
-            message(FATAL_ERROR "${required_arg} must be specified.")
+            message(FATAL_ERROR "必须指定 ${required_arg}。")
         endif()
     endforeach()
 
     if(NOT DEFINED arg_LOGNAME)
-        message(WARNING "LOGNAME should be specified.")
+        message(WARNING "应指定 LOGNAME。")
         set(arg_LOGNAME "build")
     endif()
 
@@ -55,7 +55,7 @@ function(vcpkg_execute_build_process)
     )
     if (NOT error_code MATCHES "^-?[0-9]+$")
         list(JOIN arg_COMMAND " " command)
-        message(FATAL_ERROR "Failed to execute command \"${command}\" in working directory \"${arg_WORKING_DIRECTORY}\": ${error_code}")
+        message(FATAL_ERROR "在工作目录 \"${arg_WORKING_DIRECTORY}\" 中执行命令 \"${command}\" 失败：${error_code}")
     endif()
     if(NOT error_code EQUAL "0")
         file(READ "${log_out}" out_contents)

@@ -1,25 +1,25 @@
-function(vcpkg_from_github)
+﻿function(vcpkg_from_github)
     cmake_parse_arguments(PARSE_ARGV 0 "arg"
         "USE_TARBALL_API"
         "OUT_SOURCE_PATH;REPO;REF;SHA512;HEAD_REF;GITHUB_HOST;AUTHORIZATION_TOKEN;FILE_DISAMBIGUATOR"
         "PATCHES")
 
     if(DEFINED arg_UNPARSED_ARGUMENTS)
-        message(WARNING "vcpkg_from_github was passed extra arguments: ${arg_UNPARSED_ARGUMENTS}")
+        message(WARNING "vcpkg_from_github 被传递了多余的参数: ${arg_UNPARSED_ARGUMENTS}")
     endif()
 
     if(DEFINED arg_REF AND NOT DEFINED arg_SHA512)
-        message(FATAL_ERROR "SHA512 must be specified if REF is specified.")
+        message(FATAL_ERROR "如果指定了 REF，则必须指定 SHA512。")
     endif()
     if(NOT DEFINED arg_REF AND DEFINED arg_SHA512)
-        message(FATAL_ERROR "REF must be specified if SHA512 is specified.")
+        message(FATAL_ERROR "如果指定了 SHA512，则必须指定 REF。")
     endif()
 
     if(NOT DEFINED arg_OUT_SOURCE_PATH)
-        message(FATAL_ERROR "OUT_SOURCE_PATH must be specified.")
+        message(FATAL_ERROR "必须指定 OUT_SOURCE_PATH。")
     endif()
     if(NOT DEFINED arg_REPO)
-        message(FATAL_ERROR "The GitHub repository must be specified.")
+        message(FATAL_ERROR "必须指定 GitHub 仓库。")
     endif()
 
     if(NOT DEFINED arg_GITHUB_HOST)
@@ -37,24 +37,24 @@ function(vcpkg_from_github)
 
 
     if(NOT DEFINED arg_REF AND NOT DEFINED arg_HEAD_REF)
-        message(FATAL_ERROR "At least one of REF or HEAD_REF must be specified.")
+        message(FATAL_ERROR "必须指定 REF 或 HEAD_REF 中的至少一个。")
     endif()
 
     if(NOT arg_REPO MATCHES "^([^/]*)/([^/]*)$")
-        message(FATAL_ERROR "REPO (${arg_REPO}) is not a valid repo name:
-    must be an organization name followed by a repository name separated by a single slash.")
+        message(FATAL_ERROR "REPO (${arg_REPO}) 不是有效的仓库名称:
+    必须是组织名后跟仓库名，以单个斜杠分隔。")
     endif()
     set(org_name "${CMAKE_MATCH_1}")
     set(repo_name "${CMAKE_MATCH_2}")
 
     if(VCPKG_USE_HEAD_VERSION AND NOT DEFINED arg_HEAD_REF)
-        message(STATUS "Package does not specify HEAD_REF. Falling back to non-HEAD version.")
+        message(STATUS "包未指定 HEAD_REF。回退到非 HEAD 版本。")
         set(VCPKG_USE_HEAD_VERSION OFF)
     elseif(NOT VCPKG_USE_HEAD_VERSION AND NOT DEFINED arg_REF)
-        message(FATAL_ERROR "Package does not specify REF. It must be built using --head.")
+        message(FATAL_ERROR "包未指定 REF。必须使用 --head 进行构建。")
     endif()
 
-    # exports VCPKG_HEAD_VERSION to the caller. This will get picked up by ports.cmake after the build.
+    # 向调用者导出 VCPKG_HEAD_VERSION。这将在构建后被 ports.cmake 获取。
     if(VCPKG_USE_HEAD_VERSION)
         string(REPLACE "/" "_-" sanitized_head_ref "${arg_HEAD_REF}")
         z_vcpkg_download_distfile(archive_version
@@ -64,7 +64,7 @@ function(vcpkg_from_github)
             SKIP_SHA512
             ALWAYS_REDOWNLOAD
         )
-        # Parse the github refs response with regex.
+        # 使用正则表达式解析 github refs 响应。
         file(READ "${archive_version}" version_contents)
         string(JSON head_version
             ERROR_VARIABLE head_version_err
@@ -73,10 +73,10 @@ function(vcpkg_from_github)
             "sha"
         )
         if(NOT "${head_version_err}" STREQUAL "NOTFOUND")
-            message(FATAL_ERROR "Failed to parse API response from '${version_url}':
+            message(FATAL_ERROR "无法解析来自 '${version_url}' 的 API 响应:
 ${version_contents}
 
-Error was: ${head_version_err}
+错误为: ${head_version_err}
 ")
         endif()
 
@@ -104,9 +104,8 @@ Error was: ${head_version_err}
     endif()
 
     if(arg_USE_TARBALL_API)
-        # This alternative endpoint has a better support for GitHub's personal
-        # access tokens (for instance when there is SSO enabled within the
-        # organization).
+        # 此备用端点对 GitHub 的个人访问令牌有更好的支持
+        # （例如当组织内启用了 SSO 时）。
         set(download_url
             "${github_api_url}/repos/${org_name}/${repo_name}/tarball/${ref_to_use}"
         )
@@ -116,7 +115,7 @@ Error was: ${head_version_err}
         )
     endif()
 
-    # Try to download the file information from github
+    # 尝试从 github 下载文件信息
     z_vcpkg_download_distfile(archive
         URLS "${download_url}"
         FILENAME "${downloaded_file_name}"

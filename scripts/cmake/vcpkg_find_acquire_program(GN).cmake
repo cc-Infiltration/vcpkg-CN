@@ -1,10 +1,10 @@
-set(program_name gn)
+﻿set(program_name gn)
 set(rename_binary_to "gn")
 if(EXISTS "${CURRENT_HOST_INSTALLED_DIR}/share/gn/version.txt")
     file(READ "${CURRENT_HOST_INSTALLED_DIR}/share/gn/version.txt" program_version)
     set(paths_to_search "${CURRENT_HOST_INSTALLED_DIR}/tools/gn")
-else() # Old behavior
-    message(STATUS "Consider adding vcpkg-tool-gn as a host dependency of this port or create an issue at https://github.com/microsoft/vcpkg/issues")
+else() # 旧行为
+    message(STATUS "请考虑将 vcpkg-tool-gn 作为此端口的宿主依赖项添加，或在 https://github.com/microsoft/vcpkg/issues 创建问题")
     set(cipd_download_gn "https://chrome-infra-packages.appspot.com/dl/gn/gn")
     if(CMAKE_HOST_SYSTEM_NAME STREQUAL "Linux")
         execute_process(COMMAND uname -m OUTPUT_VARIABLE HOST_ARCH OUTPUT_STRIP_TRAILING_WHITESPACE)
@@ -37,7 +37,7 @@ else() # Old behavior
             set(program_version "q5ExVHmXyD34Q_Tzb-aRxsPipO-e37-csVRhVM7IJh0C")
             set(gn_platform "windows-amd64")
             set(download_sha512 "FA764AA44EB6F48ED50E855B4DC1DD1ABE35E45FD4AAC7F059A35293A14894C1B591215E34FB0CE9362E646EA9463BA3B489EFB7EBBAA2693D14238B50E4E686")
-        else() # AMD64
+        else() # AMD64 架构
             set(program_version "q5ExVHmXyD34Q_Tzb-aRxsPipO-e37-csVRhVM7IJh0C")
             set(gn_platform "windows-amd64")
             set(download_sha512 "FA764AA44EB6F48ED50E855B4DC1DD1ABE35E45FD4AAC7F059A35293A14894C1B591215E34FB0CE9362E646EA9463BA3B489EFB7EBBAA2693D14238B50E4E686")

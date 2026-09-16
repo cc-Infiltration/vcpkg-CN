@@ -1,4 +1,4 @@
-function(vcpkg_download_sourceforge out_var)
+﻿function(vcpkg_download_sourceforge out_var)
     cmake_parse_arguments(PARSE_ARGV 1 "arg"
         ""
         "REPO;REF;SHA512;FILENAME"
@@ -6,26 +6,26 @@ function(vcpkg_download_sourceforge out_var)
 
     foreach(arg_name IN ITEMS REPO SHA512 FILENAME)
         if(NOT DEFINED "arg_${arg_name}")
-            message(FATAL_ERROR "${arg_name} is required.")
+            message(FATAL_ERROR "${arg_name} 是必需的。")
         endif()
     endforeach()
 
     if(DEFINED arg_UNPARSED_ARGUMENTS)
-        message(FATAL_ERROR "Unrecognized arguments: ${arg_UNPARSED_ARGUMENTS}")
+        message(FATAL_ERROR "无法识别的参数：${arg_UNPARSED_ARGUMENTS}")
     endif()
 
     set(sourceforge_host "https://sourceforge.net/projects")
 
-    if(arg_REPO MATCHES "^([^/]*)$") # just one element
+    if(arg_REPO MATCHES "^([^/]*)$") # 仅一个元素
         set(org_name "${CMAKE_MATCH_1}")
         set(repo_name "")
-    elseif(arg_REPO MATCHES "^([^/]*)/([^/]*)$") # two elements
+    elseif(arg_REPO MATCHES "^([^/]*)/([^/]*)$") # 两个元素
         set(org_name "${CMAKE_MATCH_1}")
         set(repo_name "${CMAKE_MATCH_2}")
     else()
-        message(FATAL_ERROR "REPO (${arg_REPO}) is not a valid repo name. It must be:
-    - an organization name without any slashes, or
-    - an organization name followed by a repository name separated by a single slash")
+        message(FATAL_ERROR "REPO（${arg_REPO}）不是有效的仓库名称。它必须是：
+    - 一个不含斜杠的组织名称，或
+    - 一个组织名称后跟一个仓库名称，中间用单个斜杠分隔")
     endif()
 
     if(NOT "${arg_REF}" STREQUAL "")
@@ -59,8 +59,8 @@ function(vcpkg_download_sourceforge out_var)
         tenet           # Wynberg, South Africa
     )
     if(DEFINED SOURCEFORGE_MIRRORS AND NOT DEFINED VCPKG_SOURCEFORGE_EXTRA_MIRRORS)
-        message(WARNING "Extension point SOURCEFORGE_MIRRORS has been deprecated.
-    Please use the replacement VCPKG_SOURCEFORGE_EXTRA_MIRRORS variable instead.")
+        message(WARNING "扩展点 SOURCEFORGE_MIRRORS 已弃用。
+    请改用替代变量 VCPKG_SOURCEFORGE_EXTRA_MIRRORS。")
         list(APPEND sourceforge_mirrors "${SOURCEFORGE_MIRRORS}")
         list(REMOVE_DUPLICATES sourceforge_mirrors)
     elseif(DEFINED VCPKG_SOURCEFORGE_EXTRA_MIRRORS)

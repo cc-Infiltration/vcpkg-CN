@@ -1,4 +1,4 @@
-macro(z_vcpkg_find_acquire_pkgconfig_msys_declare_packages)
+﻿macro(z_vcpkg_find_acquire_pkgconfig_msys_declare_packages)
     z_vcpkg_acquire_msys_declare_package(
         URL "https://mirror.msys2.org/mingw/clangarm64/mingw-w64-clang-aarch64-pkgconf-1~2.5.1-1-any.pkg.tar.zst"
         SHA512 ef9f466471f9f24b836fd553b75d046b93914fb57f15bcc048df04195e8f2086101459d42890a1f194cb7ea1ac0bc5058258cdc166c7579f95aa90d95f3406d6
@@ -18,7 +18,7 @@ endmacro()
 
 set(program_name pkg-config)
 if(DEFINED "ENV{PKG_CONFIG}")
-    debug_message(STATUS "PKG_CONFIG found in ENV! Using $ENV{PKG_CONFIG}")
+    debug_message(STATUS "在环境变量中找到 PKG_CONFIG！使用 $ENV{PKG_CONFIG}")
     set(PKGCONFIG "$ENV{PKG_CONFIG}" CACHE INTERNAL "")
     set(PKGCONFIG "${PKGCONFIG}" PARENT_SCOPE)
     return()

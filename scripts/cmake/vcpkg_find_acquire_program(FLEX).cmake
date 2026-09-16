@@ -1,8 +1,8 @@
-if(CMAKE_HOST_WIN32)
-    # This download shall be the same as in vcpkg_find_acquire_program(BISON).cmake
-    # Note that this is 2.5.24 rather than 2.5.25 due to a race in %TEMP% in 2.5.25
-    # For more information, see: https://github.com/microsoft/vcpkg/issues/29139
-    # or: https://github.com/lexxmark/winflexbison/issues/86
+﻿if(CMAKE_HOST_WIN32)
+    # 此下载应与 vcpkg_find_acquire_program(BISON).cmake 中的相同
+    # 注意，这里使用 2.5.24 而非 2.5.25，是因为 2.5.25 在 %TEMP% 中存在竞争条件
+    # 更多信息请参见: https://github.com/microsoft/vcpkg/issues/29139
+    # 或: https://github.com/lexxmark/winflexbison/issues/86
     set(program_version 2.5.24)
     set(download_urls "https://github.com/lexxmark/winflexbison/releases/download/v${program_version}/win_flex_bison-${program_version}.zip")
     set(download_filename "win_flex_bison-${program_version}.zip")

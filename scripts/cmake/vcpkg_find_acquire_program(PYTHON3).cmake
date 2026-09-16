@@ -1,4 +1,4 @@
-if(CMAKE_HOST_WIN32)
+﻿if(CMAKE_HOST_WIN32)
     set(program_name python)
     set(program_version 3.14.2)
     if(DEFINED ENV{PROCESSOR_ARCHITEW6432})
@@ -26,7 +26,7 @@ if(CMAKE_HOST_WIN32)
         set(download_sha512 05703133A3371493CCD3552DD12DB6385CBB1A34874056C8A3F26DDA6B813BF2BD535549C30AA4C0827287D9C4FF3250A49330282AD8535A06937B016D483010)
     endif()
 
-    # Remove this after the next update
+    # 在下次更新后移除此行
     string(APPEND tool_subdirectory "-1")
 
     set(paths_to_search "${DOWNLOADS}/tools/python/${tool_subdirectory}")

@@ -1,19 +1,19 @@
-# Full mirror list: https://github.com/msys2/MSYS2-packages/blob/master/pacman-mirrors/mirrorlist.msys
+﻿# 完整镜像列表：https://github.com/msys2/MSYS2-packages/blob/master/pacman-mirrors/mirrorlist.msys
 set(Z_VCPKG_ACQUIRE_MSYS_MIRRORS
-    # Alternative primary
+    # 备用主站
     "https://repo.msys2.org/"
-    # Tier 1
+    # 一级镜像
     "https://mirror.yandex.ru/mirrors/msys2/"
     "https://mirrors.tuna.tsinghua.edu.cn/msys2/"
     "https://mirrors.ustc.edu.cn/msys2/"
     "https://mirror.selfnet.de/msys2/"
 )
 
-# Downloads the given package
+# 下载指定的软件包
 function(z_vcpkg_acquire_msys_download_package out_archive)
     cmake_parse_arguments(PARSE_ARGV 1 "arg" "" "URL;SHA512;FILENAME" "")
     if(DEFINED arg_UNPARSED_ARGUMENTS)
-        message(FATAL_ERROR "internal error: z_vcpkg_acquire_msys_download_package passed extra args: ${arg_UNPARSED_ARGUMENTS}")
+        message(FATAL_ERROR "内部错误：z_vcpkg_acquire_msys_download_package 传入了多余的参数：${arg_UNPARSED_ARGUMENTS}")
     endif()
 
     string(REPLACE "https://repo.msys2.org/" "https://mirror.msys2.org/" all_urls "${arg_URL}")
@@ -30,8 +30,8 @@ function(z_vcpkg_acquire_msys_download_package out_archive)
     set("${out_archive}" "${msys_archive}" PARENT_SCOPE)
 endfunction()
 
-# Declares a package
-# Writes to the following cache variables:
+# 声明一个软件包
+# 写入以下缓存变量：
 #   - Z_VCPKG_MSYS_PACKAGES_AVAILABLE
 #   - Z_VCPKG_MSYS_${arg_NAME}_URL
 #   - Z_VCPKG_MSYS_${arg_NAME}_SHA512
@@ -45,22 +45,22 @@ function(z_vcpkg_acquire_msys_declare_package)
     cmake_parse_arguments(PARSE_ARGV 0 arg "DIRECT" "NAME;URL;SHA512" "DEPS;PATCHES;PROVIDES")
 
     if(DEFINED arg_UNPARSED_ARGUMENTS)
-        message(FATAL_ERROR "internal error: z_vcpkg_acquire_msys_declare_package passed extra args: ${arg_UNPARSED_ARGUMENTS}")
+        message(FATAL_ERROR "内部错误：z_vcpkg_acquire_msys_declare_package 传入了多余的参数：${arg_UNPARSED_ARGUMENTS}")
     endif()
     foreach(required_arg IN ITEMS URL SHA512)
         if(NOT DEFINED arg_${required_arg})
-            message(FATAL_ERROR "internal error: z_vcpkg_acquire_msys_declare_package requires argument: ${required_arg}")
+            message(FATAL_ERROR "内部错误：z_vcpkg_acquire_msys_declare_package 需要参数：${required_arg}")
         endif()
     endforeach()
 
     if(arg_DIRECT)
         if(NOT arg_NAME)
-            message(FATAL_ERROR "internal error: z_vcpkg_acquire_msys_declare_package requires argument: NAME")
+            message(FATAL_ERROR "内部错误：z_vcpkg_acquire_msys_declare_package 需要参数：NAME")
         endif()
         get_filename_component(filename "${arg_URL}" NAME)
     else()
         if(NOT arg_URL MATCHES [[^https://mirror\.msys2\.org/.*/(([^/]*)-[^-/]+-[^-/]+-[^-/]+\.pkg\.tar\.(xz|zst))$]])
-            message(FATAL_ERROR "internal error: regex does not match supplied URL to vcpkg_acquire_msys: ${arg_URL}")
+            message(FATAL_ERROR "内部错误：正则表达式与传入 vcpkg_acquire_msys 的 URL 不匹配：${arg_URL}")
         endif()
         set(filename "msys2-${CMAKE_MATCH_1}")
         if(NOT DEFINED arg_NAME)
@@ -70,7 +70,7 @@ function(z_vcpkg_acquire_msys_declare_package)
             return()
         endif()
         if(arg_NAME IN_LIST Z_VCPKG_MSYS_PACKAGES_AVAILABLE)
-            message(FATAL_ERROR "Redeclaration of package '${arg_NAME}'")
+            message(FATAL_ERROR "重复声明软件包 '${arg_NAME}'")
         endif()
     endif()
 
@@ -88,8 +88,8 @@ function(z_vcpkg_acquire_msys_declare_package)
     endforeach()
 endfunction()
 
-# Collects all required packages to satisfy the given input set
-# Writes to the following cache variables:
+# 收集所有必需的软件包以满足给定的输入集合
+# 写入以下缓存变量：
 #   - Z_VCPKG_MSYS_<name>_ARCHIVE
 function(z_vcpkg_acquire_msys_download_packages)
     cmake_parse_arguments(PARSE_ARGV 0 "arg" "" "OUT_UNKNOWN;OUT_RESOLVED" "PACKAGES")
@@ -135,14 +135,14 @@ function(z_vcpkg_acquire_msys_download_packages)
     endif()
 endfunction()
 
-# Returns a stable collection of hashes, regardless of package order
+# 返回一组稳定的哈希值，与软件包顺序无关
 function(z_vcpkg_acquire_msys_collect_hashes out_hash)
     cmake_parse_arguments(PARSE_ARGV 1 "arg" "" "" "PACKAGES")
     list(SORT arg_PACKAGES)
     set(result "")
     foreach(name IN LISTS arg_PACKAGES)
         if(NOT DEFINED Z_VCPKG_MSYS_${name}_SHA512)
-            message(FATAL_ERROR "SHA512 unknown for '${name}'.")
+            message(FATAL_ERROR "'${name}' 的 SHA512 未知。")
         endif()
         string(APPEND result "${Z_VCPKG_MSYS_${name}_SHA512}")
         foreach(patch IN LISTS Z_VCPKG_MSYS_${name}_PATCHES)
@@ -161,7 +161,7 @@ function(vcpkg_acquire_msys out_msys_root)
     )
 
     if(DEFINED arg_UNPARSED_ARGUMENTS)
-        message(WARNING "vcpkg_acquire_msys was passed extra arguments: ${arg_UNPARSED_ARGUMENTS}")
+        message(WARNING "vcpkg_acquire_msys 传入了多余的参数：${arg_UNPARSED_ARGUMENTS}")
     endif()
 
     z_vcpkg_acquire_msys_declare_all_packages()
@@ -182,11 +182,11 @@ function(vcpkg_acquire_msys out_msys_root)
         math(EXPR direct_packages_last "${direct_packages_number} - 1")
 
         if(direct_packages_parity EQUAL 1)
-            message(FATAL_ERROR "vcpkg_acquire_msys(... DIRECT_PACKAGES ...) requires exactly pairs of URL/SHA512")
+            message(FATAL_ERROR "vcpkg_acquire_msys(... DIRECT_PACKAGES ...) 需要成对的 URL/SHA512")
         endif()
 
         set(direct_packages "")
-        # direct_packages_last > direct_packages_number - 1 > 0 - 1 >= 0, so this is fine
+        # direct_packages_last > direct_packages_number - 1 > 0 - 1 >= 0，所以这样没有问题
         foreach(index RANGE "${direct_packages_last}")
             math(EXPR url_index "${index} * 2")
             math(EXPR sha512_index "${url_index} + 1")
@@ -194,7 +194,7 @@ function(vcpkg_acquire_msys out_msys_root)
             list(GET arg_DIRECT_PACKAGES "${sha512_index}" sha512)
             get_filename_component(filename "${url}" NAME)
             if(NOT filename MATCHES "^(.*)-[^-]+-[^-]+-[^-]+\.pkg\.tar\..*$")
-                message(FATAL_ERROR "Cannot determine package name for '${filename}'")
+                message(FATAL_ERROR "无法确定 '${filename}' 的软件包名称")
             endif()
             set(pkg_name "${CMAKE_MATCH_1}")
             z_vcpkg_acquire_msys_declare_package(
@@ -214,8 +214,8 @@ function(vcpkg_acquire_msys out_msys_root)
         OUT_UNKNOWN unknown
     )
     if(NOT unknown STREQUAL "")
-        message(FATAL_ERROR "Unknown packages were required for vcpkg_acquire_msys(${requested}): ${unknown}
-This can be resolved by explicitly passing URL/SHA pairs to DIRECT_PACKAGES.")
+        message(FATAL_ERROR "vcpkg_acquire_msys(${requested}) 需要未知的软件包：${unknown}
+可以通过显式地向 DIRECT_PACKAGES 传入 URL/SHA 对来解决此问题。")
     endif()
     set(Z_VCPKG_MSYS_PACKAGES_RESOLVED "${resolved}" CACHE INTERNAL "Export for CI")
 
@@ -241,13 +241,13 @@ This can be resolved by explicitly passing URL/SHA pairs to DIRECT_PACKAGES.")
         endforeach()
         file(RENAME "${path_to_root}.tmp" "${path_to_root}")
     endif()
-    # Due to skipping the regular MSYS2 installer,
-    # some config files need to be established explicitly.
+    # 由于跳过了常规的 MSYS2 安装程序，
+    # 一些配置文件需要显式创建。
     if(NOT EXISTS "${path_to_root}/etc/fstab")
-        # This fstab entry removes the cygdrive prefix from paths.
+        # 此 fstab 条目用于从路径中移除 cygdrive 前缀。
         file(WRITE "${path_to_root}/etc/fstab" "none  /  cygdrive  binary,posix=0,noacl,user  0  0")
     endif()
-    # No pkgconfig hints from msys2 installation
+    # msys2 安装中没有 pkgconfig 提示信息
     file(REMOVE_RECURSE
         "${path_to_root}/clangarm64/lib/pkgconfig"
         "${path_to_root}/clang64/lib/pkgconfig"
@@ -256,21 +256,21 @@ This can be resolved by explicitly passing URL/SHA pairs to DIRECT_PACKAGES.")
         "${path_to_root}/ucrt64/lib/pkgconfig"
         "${path_to_root}/usr/lib/pkgconfig"
     )
-    message(STATUS "Using msys root at ${path_to_root}")
+    message(STATUS "使用位于 ${path_to_root} 的 msys 根目录")
     set("${out_msys_root}" "${path_to_root}" PARENT_SCOPE)
 endfunction()
 
-# Expand this while CMAKE_CURRENT_LIST_DIR is for this file.
+# 在 CMAKE_CURRENT_LIST_DIR 指向本文件时展开此项。
 set(Z_VCPKG_AUTOMAKE_CLANG_CL_PATCH "${CMAKE_CURRENT_LIST_DIR}/compile_wrapper_consider_clang-cl.patch")
 
 macro(z_vcpkg_acquire_msys_declare_all_packages)
     set(Z_VCPKG_MSYS_PACKAGES_AVAILABLE "" CACHE INTERNAL "")
 
-    # The following list can be updated via test port vcpkg-ci-msys2[update-all].
-    # Upstream binary package information is available via
+    # 以下列表可通过测试端口 vcpkg-ci-msys2[update-all] 更新。
+    # 上游二进制包信息可通过以下地址获取：
     # https://packages.msys2.org/search?t=binpkg&q=<Pkg>
 
-    # msys subsystem
+    # msys 子系统
     z_vcpkg_acquire_msys_declare_package(
         URL "https://mirror.msys2.org/msys/x86_64/autoconf-wrapper-20250528-1-any.pkg.tar.zst"
         SHA512 a25b4d2a239bce094e6d4019d943c8381df92e3f982464f01cdb6fd79a449094ba44e0e45032270bd0f9e6c98cdaf0ab3560fc97084aaaeb708812297ee62996
@@ -358,7 +358,7 @@ macro(z_vcpkg_acquire_msys_declare_all_packages)
         SHA512 50e1969179c6b33376396f200f6c25f709a6104d253121a8148bc5591b140c6f1729dc703374315a96137fa7cfec2abe427ea63bce243d5c0729cee8964ffbd3
         DEPS libasprintf libgettextpo libintl
     )
-    # This package shouldn't be a here
+    # 这个软件包不应该出现在这里
     z_vcpkg_acquire_msys_declare_package(
         URL "https://mirror.msys2.org/msys/x86_64/gettext-devel-0.22.5-1-x86_64.pkg.tar.zst"
         SHA512 6de3e04ba238353df65111120ec4850b49f5797f27626ebc27c561390f75b4b1b25c84ac377f6ab15d586ca3ee3940eaf3aba074db1a50d8b8930c1135eae7cf
@@ -406,7 +406,7 @@ macro(z_vcpkg_acquire_msys_declare_all_packages)
     z_vcpkg_acquire_msys_declare_package(
         URL "https://mirror.msys2.org/msys/x86_64/liblzma-5.8.2-1-x86_64.pkg.tar.zst"
         SHA512 1a9353996e7da8b90ff6a95b4199953a0c72350f6e1b7133373161ce221640ae63260ebaf95278bb099432bd3e30b1138b3da98b6e5a1a4b9af1223e0cda8b54
-        # This package installs only a DLL. No extra deps.
+        # 此软件包仅安装一个 DLL。无额外依赖。
         DEPS # gettext libiconv sh
     )
     z_vcpkg_acquire_msys_declare_package(
@@ -423,7 +423,7 @@ macro(z_vcpkg_acquire_msys_declare_all_packages)
         URL "https://mirror.msys2.org/msys/x86_64/libtool-2.5.4-4-x86_64.pkg.tar.zst"
         SHA512 72589fe4526fffac7aaea38a86c2c037cf1094f7bfe1be65543221a3104dfa2ef7d8d6adb8758119c1a74368c881d690988cd3cbe7502a5202d351382271c9c5
         DEPS bash
-             # extra deps which are really needed
+             # 真正需要的额外依赖
              awk findutils grep sed tar
     )
     z_vcpkg_acquire_msys_declare_package(
@@ -450,7 +450,7 @@ macro(z_vcpkg_acquire_msys_declare_all_packages)
         SHA512 80fa09c637c4ff3943b20a5b74e945c7084e1f7d571d7124a5b45926533a24125a0027167f99eb9c1e9f96fc3d61344e23c0b4471815846d90367bcfb8f89eba
         DEPS gmp
     )
-    if(X_VCPKG_USE_MSYS2_RUNTIME_3.4) # temporary option, for Windows 7.0 and 8.0, or in case of regressions
+    if(X_VCPKG_USE_MSYS2_RUNTIME_3.4) # 临时选项，用于 Windows 7.0 和 8.0，或在出现回归时使用
         z_vcpkg_acquire_msys_declare_package(
             URL "https://mirror.msys2.org/msys/x86_64/msys2-runtime-3.4-3.4.10-2-x86_64.pkg.tar.zst"
             SHA512 3fa087d4eb4e260785b81d5b6f4400ec128a83ff940da732bf147dfde457224573fa467e735b63c9a138872f5c9830f3684f824b2aa5d344fb95dfb91632f832
@@ -517,7 +517,7 @@ macro(z_vcpkg_acquire_msys_declare_all_packages)
         DEPS gcc-libs
     )
 
-    # mingw64 subsystem
+    # mingw64 子系统
     z_vcpkg_acquire_msys_declare_package(
         URL "https://mirror.msys2.org/mingw/mingw64/mingw-w64-x86_64-bzip2-1.0.8-3-any.pkg.tar.zst"
         SHA512 fb1ae524d7b04e1f35c3101c318136dbe08da8093bda98f6aea7e6c2564fec5f8533fb61cac5001b6425105cd982511964ec04099c6651f990dc3b8baf7f7057

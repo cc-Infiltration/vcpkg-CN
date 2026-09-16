@@ -2,7 +2,7 @@ list(APPEND Z_VCPKG_ACQUIRE_MSYS_DECLARE_PACKAGE_COMMANDS "z_vcpkg_find_fortran_
 
 function(vcpkg_find_fortran out_var)
     if("${ARGC}" GREATER "1")
-        message(WARNING "${CMAKE_CURRENT_FUNCTION} was passed extra args: ${ARGN}")
+        message(WARNING "${CMAKE_CURRENT_FUNCTION} 被传递了多余的参数: ${ARGN}")
     endif()
 
     vcpkg_list(SET additional_cmake_args)
@@ -11,11 +11,11 @@ function(vcpkg_find_fortran out_var)
     set(CMAKE_CURRENT_BINARY_DIR "${CMAKE_BINARY_DIR}")
     set(CMAKE_PLATFORM_INFO_DIR "${CMAKE_BINARY_DIR}/Platform")
     macro(z_vcpkg_warn_ambiguous_system_variables)
-    # CMakeDetermineFortranCompiler is for project mode.
+    # CMakeDetermineFortranCompiler 用于项目模式。
     endmacro()
 
     if(VCPKG_PROVIDED_FORTRAN)
-        message(STATUS "Using MinGW gfortran; set VCPKG_PROVIDED_FORTRAN=OFF if supplying Fortran from your toolchain")
+        message(STATUS "使用 MinGW gfortran；如果从你的工具链提供 Fortran，请设置 VCPKG_PROVIDED_FORTRAN=OFF")
         if("${VCPKG_TARGET_ARCHITECTURE}" STREQUAL "x86")
             set(mingw_path mingw32)
             set(machine_flag -m32)

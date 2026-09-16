@@ -1,12 +1,12 @@
-function(vcpkg_copy_tools)
+﻿function(vcpkg_copy_tools)
     cmake_parse_arguments(PARSE_ARGV 0 arg "AUTO_CLEAN" "SEARCH_DIR;DESTINATION" "TOOL_NAMES")
 
     if(DEFINED arg_UNPARSED_ARGUMENTS)
-        message(WARNING "${CMAKE_CURRENT_FUNCTION} was passed extra arguments: ${arg_UNPARSED_ARGUMENTS}")
+        message(WARNING "${CMAKE_CURRENT_FUNCTION} 传入了多余的参数：${arg_UNPARSED_ARGUMENTS}")
     endif()
 
     if(NOT DEFINED arg_TOOL_NAMES)
-        message(FATAL_ERROR "TOOL_NAMES must be specified.")
+        message(FATAL_ERROR "必须指定 TOOL_NAMES。")
     endif()
 
     if(NOT DEFINED arg_DESTINATION)
@@ -16,7 +16,7 @@ function(vcpkg_copy_tools)
     if(NOT DEFINED arg_SEARCH_DIR)
         set(arg_SEARCH_DIR "${CURRENT_PACKAGES_DIR}/bin")
     elseif(NOT IS_DIRECTORY "${arg_SEARCH_DIR}")
-        message(FATAL_ERROR "SEARCH_DIR (${arg_SEARCH_DIR}) must be a directory")
+        message(FATAL_ERROR "SEARCH_DIR（${arg_SEARCH_DIR}）必须是一个目录")
     endif()
 
     foreach(tool_name IN LISTS arg_TOOL_NAMES)
@@ -29,12 +29,12 @@ function(vcpkg_copy_tools)
             if(EXISTS "${bundle_path}")
                 file(COPY "${bundle_path}" DESTINATION "${arg_DESTINATION}")
             else()
-                message(FATAL_ERROR "Couldn't find tool \"${tool_name}\":
-    neither \"${tool_path}\" nor \"${bundle_path}\" exists")
+                message(FATAL_ERROR "找不到工具 \"${tool_name}\"：
+    \"${tool_path}\" 和 \"${bundle_path}\" 均不存在")
             endif()
         else()
-            message(FATAL_ERROR "Couldn't find tool \"${tool_name}\":
-    \"${tool_path}\" does not exist")
+            message(FATAL_ERROR "找不到工具 \"${tool_name}\"：
+    \"${tool_path}\" 不存在")
         endif()
         if(EXISTS "${tool_pdb}")
             file(COPY "${tool_pdb}" DESTINATION "${arg_DESTINATION}")

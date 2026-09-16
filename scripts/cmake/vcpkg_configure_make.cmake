@@ -1,5 +1,5 @@
 macro(z_vcpkg_determine_autotools_host_cpu out_var)
-    # TODO: the host system processor architecture can differ from the host triplet target architecture
+    # TODO: 主机系统处理器架构可能与主机三元组目标架构不同
     if(DEFINED ENV{PROCESSOR_ARCHITEW6432})
         set(host_arch $ENV{PROCESSOR_ARCHITEW6432})
     elseif(DEFINED ENV{PROCESSOR_ARCHITECTURE})
@@ -16,7 +16,7 @@ macro(z_vcpkg_determine_autotools_host_cpu out_var)
     elseif(host_arch MATCHES "^(ARM|arm)$")
         set(${out_var} arm)
     else()
-        message(FATAL_ERROR "Unsupported host architecture ${host_arch} in z_vcpkg_determine_autotools_host_cpu!" )
+        message(FATAL_ERROR "在 z_vcpkg_determine_autotools_host_cpu 中不支持的主机架构 ${host_arch}！" )
     endif()
     unset(host_arch)
 endmacro()
@@ -31,13 +31,13 @@ macro(z_vcpkg_determine_autotools_target_cpu out_var)
     elseif(VCPKG_TARGET_ARCHITECTURE MATCHES "^(ARM|arm)$")
         set(${out_var} arm)
     else()
-        message(FATAL_ERROR "Unsupported VCPKG_TARGET_ARCHITECTURE architecture ${VCPKG_TARGET_ARCHITECTURE} in z_vcpkg_determine_autotools_target_cpu!" )
+        message(FATAL_ERROR "在 z_vcpkg_determine_autotools_target_cpu 中不支持的 VCPKG_TARGET_ARCHITECTURE 架构 ${VCPKG_TARGET_ARCHITECTURE}！" )
     endif()
 endmacro()
 
 macro(z_vcpkg_set_arch_mac out_var value)
-    # Better match the arch behavior of config.guess
-    # See: https://git.savannah.gnu.org/gitweb/?p=config.git;a=blob_plain;f=config.guess;hb=HEAD
+    # 更好地匹配 config.guess 的架构行为
+    # 参见: https://git.savannah.gnu.org/gitweb/?p=config.git;a=blob_plain;f=config.guess;hb=HEAD
     if("${value}" MATCHES "^(ARM|arm)64$")
         set(${out_var} "aarch64")
     else()
@@ -61,11 +61,11 @@ macro(z_vcpkg_determine_autotools_target_arch_mac out_var)
     unset(osx_archs_num)
 endmacro()
 
-# Define variables used in both vcpkg_configure_make and vcpkg_build_make:
-# short_name_<CONFIG>:           unique abbreviation for the given build type (rel, dbg)
-# path_suffix_<CONFIG>:          installation path suffix for the given build type ('', /debug)
-# current_installed_dir_escaped: CURRENT_INSTALLED_DIR with escaped space characters
-# current_installed_dir_msys:    CURRENT_INSTALLED_DIR with unprotected spaces, but drive letters transformed for msys
+# 定义在 vcpkg_configure_make 和 vcpkg_build_make 中使用的变量：
+# short_name_<CONFIG>:           给定构建类型的唯一缩写 (rel, dbg)
+# path_suffix_<CONFIG>:          给定构建类型的安装路径后缀 ('', /debug)
+# current_installed_dir_escaped: 转义了空格字符的 CURRENT_INSTALLED_DIR
+# current_installed_dir_msys:    未转义空格但驱动器盘符已为 msys 转换的 CURRENT_INSTALLED_DIR
 macro(z_vcpkg_configure_make_common_definitions)
     set(short_name_RELEASE "rel")
     set(short_name_DEBUG "dbg")
@@ -73,8 +73,8 @@ macro(z_vcpkg_configure_make_common_definitions)
     set(path_suffix_RELEASE "")
     set(path_suffix_DEBUG "/debug")
 
-    # Some PATH handling for dealing with spaces....some tools will still fail with that!
-    # In particular, the libtool install command is unable to install correctly to paths with spaces.
+    # 一些处理空格的 PATH 操作....一些工具仍会因此失败！
+    # 特别是 libtool 的 install 命令无法正确安装到带空格的路径。
     string(REPLACE " " "\\ " current_installed_dir_escaped "${CURRENT_INSTALLED_DIR}")
     set(current_installed_dir_msys "${CURRENT_INSTALLED_DIR}")
     if(CMAKE_HOST_WIN32)
@@ -82,17 +82,17 @@ macro(z_vcpkg_configure_make_common_definitions)
     endif()
 endmacro()
 
-# Initializes well-known and auxiliary variables for flags
-# - CPPFLAGS_<CONFIG>: preprocessor flags common to C and CXX
+# 初始化标志的已知变量和辅助变量
+# - CPPFLAGS_<CONFIG>: C 和 CXX 共用的预处理器标志
 # - CFLAGS_<CONFIG>
 # - CXXFLAGS_<CONFIG>
 # - LDFLAGS_<CONFIG>
 # - ARFLAGS_<CONFIG>
 # - LINK_ENV_${var_suffix}
-# Prerequisite: VCPKG_DETECTED_CMAKE_... vars loaded
+# 前提条件: 已加载 VCPKG_DETECTED_CMAKE_... 变量
 function(z_vcpkg_configure_make_process_flags var_suffix)
-    # separate_arguments is needed to remove outer quotes from detected cmake variables.
-    # (e.g. Android NDK has "--sysroot=...")
+    # 需要 separate_arguments 来移除检测到的 cmake 变量的外层引号。
+    # （例如 Android NDK 有 "--sysroot=..."）
     separate_arguments(CFLAGS NATIVE_COMMAND "Z_VCM_WRAP ${VCPKG_DETECTED_CMAKE_C_FLAGS_${var_suffix}} Z_VCM_WRAP")
     separate_arguments(CXXFLAGS NATIVE_COMMAND "Z_VCM_WRAP ${VCPKG_DETECTED_CMAKE_CXX_FLAGS_${var_suffix}} Z_VCM_WRAP")
     separate_arguments(LDFLAGS NATIVE_COMMAND "${VCPKG_DETECTED_CMAKE_SHARED_LINKER_FLAGS_${var_suffix}}")
@@ -102,7 +102,7 @@ function(z_vcpkg_configure_make_process_flags var_suffix)
     endforeach()
     set(z_vcm_all_flags "${z_vcm_all_flags}" PARENT_SCOPE)
 
-    # Filter common CPPFLAGS out of CFLAGS and CXXFLAGS
+    # 从 CFLAGS 和 CXXFLAGS 中过滤出共用的 CPPFLAGS
     vcpkg_list(SET CPPFLAGS)
     vcpkg_list(SET pattern)
     foreach(arg IN LISTS CXXFLAGS)
@@ -159,17 +159,17 @@ function(z_vcpkg_configure_make_process_flags var_suffix)
         vcpkg_list(SET pattern)
     endforeach()
 
-    # Remove start/end placeholders
+    # 移除起始/结束占位符
     foreach(list IN ITEMS CFLAGS CXXFLAGS)
         vcpkg_list(REMOVE_ITEM ${list} "Z_VCM_WRAP")
     endforeach()
 
-    # libtool tries to filter CFLAGS passed to the link stage via an allow-list.
-    # This approach is flawed since it fails to pass flags unknown to libtool
-    # but required for linking to the link stage (e.g. -fsanitize=<x>).
-    # libtool has an -R option so we need to guard against -RTC by using -Xcompiler.
-    # While configuring there might be a lot of unknown compiler option warnings
-    # due to that; just ignore them.
+    # libtool 尝试通过允许列表来过滤传递给链接阶段的 CFLAGS。
+    # 此方法有缺陷，因为它无法传递 libtool 未知的
+    # 但链接所需的标志（例如 -fsanitize=<x>）。
+    # libtool 有 -R 选项，因此我们需要使用 -Xcompiler 来防止 -RTC。
+    # 配置时可能会有大量未知的编译器选项警告
+    # ；直接忽略它们。
     set(compiler_flag_escape "")
     if(VCPKG_DETECTED_CMAKE_C_COMPILER_FRONTEND_VARIANT STREQUAL "MSVC" OR VCPKG_DETECTED_CMAKE_C_COMPILER_ID STREQUAL "MSVC")
         set(compiler_flag_escape "-Xcompiler ")
@@ -179,18 +179,18 @@ function(z_vcpkg_configure_make_process_flags var_suffix)
         list(TRANSFORM CXXFLAGS PREPEND "${compiler_flag_escape}")
     endif()
 
-    # Could use a future VCPKG_DETECTED_CMAKE_LIBRARY_PATH_FLAG
+    # 可以使用未来的 VCPKG_DETECTED_CMAKE_LIBRARY_PATH_FLAG
     set(library_path_flag "-L")
-    # Could use a future VCPKG_DETECTED_MSVC
+    # 可以使用未来的 VCPKG_DETECTED_MSVC
     if(VCPKG_TARGET_IS_WINDOWS AND VCPKG_DETECTED_CMAKE_LINKER MATCHES [[link\.exe$]])
         set(library_path_flag "-LIBPATH:")
     endif()
     set(linker_flag_escape "")
     if(VCPKG_TARGET_IS_WINDOWS AND VCPKG_DETECTED_CMAKE_C_COMPILER MATCHES [[cl\.exe$]])
-        # Removed by libtool
+        # 被 libtool 移除
         set(linker_flag_escape "-Xlinker ")
         if(arg_USE_WRAPPERS)
-            # 1st and 3rd are removed by libtool, 2nd by wrapper
+            # 第1个和第3个被 libtool 移除，第2个被 wrapper 移除
             set(linker_flag_escape "-Xlinker -Xlinker -Xlinker ")
         endif()
         if(VCPKG_LIBRARY_LINKAGE STREQUAL "static")
@@ -210,9 +210,9 @@ function(z_vcpkg_configure_make_process_flags var_suffix)
     endif()
 
     if(ARFLAGS)
-        # ARFLAGS need to know the command for creating an archive (Maybe needs user customization?)
-        # or extract it from CMake via CMAKE_${lang}_ARCHIVE_CREATE ?
-        # or from CMAKE_${lang}_${rule} with rule being one of CREATE_SHARED_MODULE CREATE_SHARED_LIBRARY LINK_EXECUTABLE
+        # ARFLAGS 需要知道创建归档的命令（可能需要用户自定义？）
+        # 或者通过 CMAKE_${lang}_ARCHIVE_CREATE 从 CMake 中提取？
+        # 或者从 CMAKE_${lang}_${rule} 中提取，其中 rule 为 CREATE_SHARED_MODULE CREATE_SHARED_LIBRARY LINK_EXECUTABLE 之一
         vcpkg_list(PREPEND ARFLAGS "cr")
     endif()
 
@@ -223,7 +223,7 @@ function(z_vcpkg_configure_make_process_flags var_suffix)
 endfunction()
 
 macro(z_vcpkg_append_to_configure_environment inoutstring var defaultval)
-    # Allows to overwrite settings in custom triplets via the environment on windows
+    # 允许在 Windows 上通过环境变量覆盖自定义三元组中的设置
     if(CMAKE_HOST_WIN32 AND DEFINED ENV{${var}})
         string(APPEND ${inoutstring} " ${var}='$ENV{${var}}'")
     else()
@@ -232,7 +232,7 @@ macro(z_vcpkg_append_to_configure_environment inoutstring var defaultval)
 endmacro()
 
 function(vcpkg_configure_make)
-    # parse parameters such that semicolons in options arguments to COMMAND don't get erased
+    # 解析参数，使得 COMMAND 选项参数中的分号不会被擦除
     cmake_parse_arguments(PARSE_ARGV 0 arg
         "AUTOCONFIG;SKIP_CONFIGURE;COPY_SOURCE;DISABLE_VERBOSE_FLAGS;NO_ADDITIONAL_PATHS;ADD_BIN_TO_PATH;NO_DEBUG;USE_WRAPPERS;NO_WRAPPERS;DETERMINE_BUILD_TRIPLET"
         "SOURCE_PATH;PROJECT_SUBPATH;PRERUN_SHELL;BUILD_TRIPLET"
@@ -240,51 +240,51 @@ function(vcpkg_configure_make)
     )
 
     if(DEFINED arg_UNPARSED_ARGUMENTS)
-        message(WARNING "${CMAKE_CURRENT_FUNCTION} was passed extra arguments: ${arg_UNPARSED_ARGUMENTS}")
+        message(WARNING "${CMAKE_CURRENT_FUNCTION} 被传递了多余的参数: ${arg_UNPARSED_ARGUMENTS}")
     endif()
 
     if(arg_USE_WRAPPERS AND arg_NO_WRAPPERS)
-        message(FATAL_ERROR "${CMAKE_CURRENT_FUNCTION} was passed conflicting options USE_WRAPPERS and NO_WRAPPERS. Please remove one of them!")
+        message(FATAL_ERROR "${CMAKE_CURRENT_FUNCTION} 被传递了冲突的选项 USE_WRAPPERS 和 NO_WRAPPERS。请移除其中一个！")
     endif()
 
     z_vcpkg_get_cmake_vars(cmake_vars_file)
-    debug_message("Including cmake vars from: ${cmake_vars_file}")
+    debug_message("正在从以下位置包含 cmake 变量: ${cmake_vars_file}")
     include("${cmake_vars_file}")
 
     if(DEFINED VCPKG_MAKE_BUILD_TRIPLET)
-        set(arg_BUILD_TRIPLET ${VCPKG_MAKE_BUILD_TRIPLET}) # Triplet overwrite for crosscompiling
+        set(arg_BUILD_TRIPLET ${VCPKG_MAKE_BUILD_TRIPLET}) # 用于交叉编译的三元组覆盖
     endif()
 
     set(src_dir "${arg_SOURCE_PATH}/${arg_PROJECT_SUBPATH}")
 
-    set(requires_autogen OFF) # use autogen.sh
-    set(requires_autoconfig OFF) # use autotools and configure.ac
-    if(EXISTS "${src_dir}/configure" AND EXISTS "${src_dir}/configure.ac" AND arg_AUTOCONFIG) # remove configure; rerun autoconf
+    set(requires_autogen OFF) # 使用 autogen.sh
+    set(requires_autoconfig OFF) # 使用 autotools 和 configure.ac
+    if(EXISTS "${src_dir}/configure" AND EXISTS "${src_dir}/configure.ac" AND arg_AUTOCONFIG) # 移除 configure；重新运行 autoconf
         set(requires_autoconfig ON)
-        file(REMOVE "${SRC_DIR}/configure") # remove possible outdated configure scripts
+        file(REMOVE "${SRC_DIR}/configure") # 移除可能过时的 configure 脚本
     elseif(arg_SKIP_CONFIGURE)
-        # no action requested
+        # 未请求任何操作
     elseif(EXISTS "${src_dir}/configure")
-        # run normally; no autoconf or autogen required
-    elseif(EXISTS "${src_dir}/configure.ac") # Run autoconfig
+        # 正常运行；不需要 autoconf 或 autogen
+    elseif(EXISTS "${src_dir}/configure.ac") # 运行 autoconfig
         set(requires_autoconfig ON)
         set(arg_AUTOCONFIG ON)
-    elseif(EXISTS "${src_dir}/autogen.sh") # Run autogen
+    elseif(EXISTS "${src_dir}/autogen.sh") # 运行 autogen
         set(requires_autogen ON)
     else()
-        message(FATAL_ERROR "Could not determine method to configure make")
+        message(FATAL_ERROR "无法确定配置 make 的方法")
     endif()
 
     debug_message("requires_autogen:${requires_autogen}")
     debug_message("requires_autoconfig:${requires_autoconfig}")
 
-    if(CMAKE_HOST_WIN32 AND VCPKG_DETECTED_CMAKE_C_COMPILER MATCHES "cl.exe") #only applies to windows (clang-)cl and lib
+    if(CMAKE_HOST_WIN32 AND VCPKG_DETECTED_CMAKE_C_COMPILER MATCHES "cl.exe") #仅适用于 Windows 的 (clang-)cl 和 lib
         if(arg_AUTOCONFIG)
             set(arg_USE_WRAPPERS ON)
         else()
-            # Keep the setting from portfiles.
-            # Without autotools we assume a custom configure script which correctly handles cl and lib.
-            # Otherwise the port needs to set CC|CXX|AR and probably CPP.
+            # 保留 portfile 中的设置。
+            # 如果没有 autotools，我们假定使用自定义的 configure 脚本，它能正确处理 cl 和 lib。
+            # 否则端口需要设置 CC|CXX|AR 可能还有 CPP。
         endif()
     else()
         set(arg_USE_WRAPPERS OFF)
@@ -293,21 +293,21 @@ function(vcpkg_configure_make)
         set(arg_USE_WRAPPERS OFF)
     endif()
 
-    # Backup environment variables
+    # 备份环境变量
     # CCAS CC C CPP CXX FC FF GC LD LF LIBTOOL OBJC OBJCXX R UPC Y
     set(cm_FLAGS AR AS CCAS CC C CPP CXX FC FF GC LD LF LIBTOOL OBJC OBJXX R UPC Y RC)
     list(TRANSFORM cm_FLAGS APPEND "FLAGS")
     vcpkg_backup_env_variables(VARS ${cm_FLAGS})
 
 
-    # FC fotran compiler | FF Fortran 77 compiler
-    # LDFLAGS -> pass -L flags
-    # LIBS -> pass -l flags
+    # FC Fortran 编译器 | FF Fortran 77 编译器
+    # LDFLAGS -> 传递 -L 标志
+    # LIBS -> 传递 -l 标志
 
-    # Used by gcc/linux
+    # 用于 gcc/linux
     vcpkg_backup_env_variables(VARS C_INCLUDE_PATH CPLUS_INCLUDE_PATH LIBRARY_PATH LD_LIBRARY_PATH)
 
-    # Used by cl
+    # 用于 cl
     vcpkg_backup_env_variables(VARS INCLUDE LIB LIBPATH)
 
     vcpkg_list(SET z_vcm_paths_with_spaces)
@@ -318,22 +318,22 @@ function(vcpkg_configure_make)
         vcpkg_list(APPEND z_vcm_paths_with_spaces "${CURRENT_INSTALLED_DIR}")
     endif()
     if(z_vcm_paths_with_spaces)
-        # Don't bother with whitespace. The tools will probably fail and I tried very hard trying to make it work (no success so far)!
-        vcpkg_list(APPEND z_vcm_paths_with_spaces "Please move the path to one without whitespaces!")
+        # 不必担心空格。工具可能会失败，我已经非常努力地尝试使其工作（至今未成功）！
+        vcpkg_list(APPEND z_vcm_paths_with_spaces "请将路径移动到不含空格的位置！")
         list(JOIN z_vcm_paths_with_spaces "\n   " z_vcm_paths_with_spaces)
-        message(STATUS "Warning: Paths with embedded space may be handled incorrectly by configure:\n   ${z_vcm_paths_with_spaces}")
+        message(STATUS "警告: 路径中包含空格可能会被 configure 错误处理:\n   ${z_vcm_paths_with_spaces}")
     endif()
 
     set(configure_env "V=1")
 
-    # Establish a bash environment as expected by autotools.
+    # 建立 autotools 所需的 bash 环境。
     if(CMAKE_HOST_WIN32)
         list(APPEND msys_require_packages autoconf-wrapper automake-wrapper binutils libtool make pkgconf which)
         vcpkg_acquire_msys(MSYS_ROOT PACKAGES ${msys_require_packages} ${arg_ADDITIONAL_MSYS_PACKAGES})
         set(base_cmd "${MSYS_ROOT}/usr/bin/bash.exe" --noprofile --norc --debug)
         vcpkg_list(SET add_to_env)
         if(arg_USE_WRAPPERS AND VCPKG_TARGET_IS_WINDOWS)
-            vcpkg_list(APPEND add_to_env "${SCRIPTS}/buildsystems/make_wrapper") # Other required wrappers are also located there
+            vcpkg_list(APPEND add_to_env "${SCRIPTS}/buildsystems/make_wrapper") # 其他所需的 wrapper 也位于此处
             vcpkg_list(APPEND add_to_env "${MSYS_ROOT}/usr/share/automake-1.16")
         endif()
         cmake_path(CONVERT "$ENV{PATH}" TO_CMAKE_PATH_LIST path_list NORMALIZE)
@@ -341,7 +341,7 @@ function(vcpkg_configure_make)
         cmake_path(CONVERT "$ENV{LOCALAPPDATA}" TO_CMAKE_PATH_LIST local_app_data NORMALIZE)
         file(REAL_PATH "${system_root}" system_root)
 
-        message(DEBUG "path_list:${path_list}") # Just to have --trace-expand output
+        message(DEBUG "path_list:${path_list}") # 仅为获取 --trace-expand 输出
 
         vcpkg_list(SET find_system_dirs
             "${system_root}/System32"
@@ -364,7 +364,7 @@ function(vcpkg_configure_make)
         endforeach()
 
         if(appending)
-            message(WARNING "Unable to find system dir in the PATH variable! Appending required msys paths!")
+            message(WARNING "在 PATH 变量中找不到系统目录！正在追加所需的 msys 路径！")
         endif()
         vcpkg_list(INSERT path_list "${index}" ${add_to_env} "${MSYS_ROOT}/usr/bin")
 
@@ -374,71 +374,71 @@ function(vcpkg_configure_make)
         find_program(base_cmd bash REQUIRED)
     endif()
 
-    # Apple platforms - cross-compiling support
+    # Apple 平台 - 交叉编译支持
     if(VCPKG_TARGET_IS_APPLE)
         if (requires_autoconfig AND NOT arg_BUILD_TRIPLET OR arg_DETERMINE_BUILD_TRIPLET)
-            z_vcpkg_determine_autotools_host_arch_mac(BUILD_ARCH) # machine you are building on => --build=
+            z_vcpkg_determine_autotools_host_arch_mac(BUILD_ARCH) # 构建所在的机器 => --build=
             z_vcpkg_determine_autotools_target_arch_mac(TARGET_ARCH)
-            # --build: the machine you are building on
-            # --host: the machine you are building for
-            # --target: the machine that CC will produce binaries for
+            # --build: 构建所在的机器
+            # --host: 为其构建的机器
+            # --target: CC 将为其生成二进制文件的机器
             # https://stackoverflow.com/questions/21990021/how-to-determine-host-value-for-configure-when-using-cross-compiler
-            # Only for ports using autotools so we can assume that they follow the common conventions for build/target/host
-            if(NOT "${TARGET_ARCH}" STREQUAL "${BUILD_ARCH}" OR NOT VCPKG_TARGET_IS_OSX) # we don't need to specify the additional flags if we build natively.
-                set(arg_BUILD_TRIPLET "--host=${TARGET_ARCH}-apple-darwin") # (Host activates crosscompilation; The name given here is just the prefix of the host tools for the target)
+            # 仅适用于使用 autotools 的端口，因此我们可以假定它们遵循 build/target/host 的通用约定
+            if(NOT "${TARGET_ARCH}" STREQUAL "${BUILD_ARCH}" OR NOT VCPKG_TARGET_IS_OSX) # 如果是原生构建，则不需要指定额外标志。
+                set(arg_BUILD_TRIPLET "--host=${TARGET_ARCH}-apple-darwin") # （Host 激活交叉编译；此处给出的名称只是目标主机工具的前缀）
             endif()
-            debug_message("Using make triplet: ${arg_BUILD_TRIPLET}")
+            debug_message("使用的 make 三元组: ${arg_BUILD_TRIPLET}")
         endif()
     endif()
 
-    # Linux / BSD / Solaris - cross-compiling support
+    # Linux / BSD / Solaris - 交叉编译支持
     if(VCPKG_TARGET_IS_LINUX OR VCPKG_TARGET_IS_BSD OR VCPKG_TARGET_IS_SOLARIS)
         if (requires_autoconfig AND NOT arg_BUILD_TRIPLET OR arg_DETERMINE_BUILD_TRIPLET)
-            # The regex below takes the prefix from the resulting CMAKE_C_COMPILER variable eg. arm-linux-gnueabihf-gcc
-            # set in the common toolchains/linux.cmake
-            # This is used via --host as a prefix for all other bin tools as well.
-            # Setting the compiler directly via CC=arm-linux-gnueabihf-gcc does not work acording to:
+            # 下面的正则表达式从结果 CMAKE_C_COMPILER 变量中提取前缀，例如 arm-linux-gnueabihf-gcc
+            # 在通用 toolchains/linux.cmake 中设置
+            # 这通过 --host 用作所有其他 bin 工具的前缀。
+            # 直接通过 CC=arm-linux-gnueabihf-gcc 设置编译器不起作用，参见:
             # https://www.gnu.org/software/autoconf/manual/autoconf-2.65/html_node/Specifying-Target-Triplets.html
             if(VCPKG_DETECTED_CMAKE_C_COMPILER MATCHES "([^\/]*)-gcc$" AND CMAKE_MATCH_1)
-                set(arg_BUILD_TRIPLET "--host=${CMAKE_MATCH_1}") # (Host activates crosscompilation; The name given here is just the prefix of the host tools for the target)
+                set(arg_BUILD_TRIPLET "--host=${CMAKE_MATCH_1}") # （Host 激活交叉编译；此处给出的名称只是目标主机工具的前缀）
             endif()
-            debug_message("Using make triplet: ${arg_BUILD_TRIPLET}")
+            debug_message("使用的 make 三元组: ${arg_BUILD_TRIPLET}")
         endif()
     endif()
 
-    # Pre-processing windows configure requirements
+    # 预处理 Windows 配置需求
     if (VCPKG_TARGET_IS_WINDOWS)
         if (arg_DETERMINE_BUILD_TRIPLET OR NOT arg_BUILD_TRIPLET)
-            z_vcpkg_determine_autotools_host_cpu(BUILD_ARCH) # VCPKG_HOST => machine you are building on => --build=
+            z_vcpkg_determine_autotools_host_cpu(BUILD_ARCH) # VCPKG_HOST => 构建所在的机器 => --build=
             z_vcpkg_determine_autotools_target_cpu(TARGET_ARCH)
-            # --build: the machine you are building on
-            # --host: the machine you are building for
-            # --target: the machine that CC will produce binaries for
+            # --build: 构建所在的机器
+            # --host: 为其构建的机器
+            # --target: CC 将为其生成二进制文件的机器
             # https://stackoverflow.com/questions/21990021/how-to-determine-host-value-for-configure-when-using-cross-compiler
-            # Only for ports using autotools so we can assume that they follow the common conventions for build/target/host
+            # 仅适用于使用 autotools 的端口，因此我们可以假定它们遵循 build/target/host 的通用约定
             if(CMAKE_HOST_WIN32)
-                # Respect host triplet when determining --build
+                # 确定时考虑主机三元组 --build
                 if(NOT VCPKG_CROSSCOMPILING)
                     set(_win32_build_arch "${TARGET_ARCH}")
                 else()
                     set(_win32_build_arch "${BUILD_ARCH}")
                 endif()
 
-                # This is required since we are running in a msys
-                # shell which will be otherwise identified as ${BUILD_ARCH}-pc-msys
+                # 这是必需的，因为我们在 msys
+                # shell 中运行，否则会被识别为 ${BUILD_ARCH}-pc-msys
                 set(arg_BUILD_TRIPLET "--build=${_win32_build_arch}-pc-mingw32")
             endif()
-            if(NOT TARGET_ARCH MATCHES "${BUILD_ARCH}" OR NOT CMAKE_HOST_WIN32) # we don't need to specify the additional flags if we build nativly, this does not hold when we are not on windows
-                string(APPEND arg_BUILD_TRIPLET " --host=${TARGET_ARCH}-pc-mingw32") # (Host activates crosscompilation; The name given here is just the prefix of the host tools for the target)
+            if(NOT TARGET_ARCH MATCHES "${BUILD_ARCH}" OR NOT CMAKE_HOST_WIN32) # 原生构建时不需要指定额外标志，不在 Windows 上时则不适用
+                string(APPEND arg_BUILD_TRIPLET " --host=${TARGET_ARCH}-pc-mingw32") # （Host 激活交叉编译；此处给出的名称只是目标主机工具的前缀）
             endif()
             if(VCPKG_TARGET_IS_UWP AND NOT arg_BUILD_TRIPLET MATCHES "--host")
-                # Needs to be different from --build to enable cross builds.
+                # 需要与 --build 不同以启用交叉构建。
                 string(APPEND arg_BUILD_TRIPLET " --host=${TARGET_ARCH}-unknown-mingw32")
             endif()
-            debug_message("Using make triplet: ${arg_BUILD_TRIPLET}")
+            debug_message("使用的 make 三元组: ${arg_BUILD_TRIPLET}")
         endif()
 
-        # Remove full filepaths due to spaces and prepend filepaths to PATH (cross-compiling tools are unlikely on path by default)
+        # 由于空格问题移除完整文件路径，并将文件路径前置到 PATH 中（交叉编译工具默认不太可能在 PATH 中）
         set(progs VCPKG_DETECTED_CMAKE_C_COMPILER VCPKG_DETECTED_CMAKE_CXX_COMPILER VCPKG_DETECTED_CMAKE_AR
                   VCPKG_DETECTED_CMAKE_LINKER VCPKG_DETECTED_CMAKE_RANLIB VCPKG_DETECTED_CMAKE_OBJDUMP
                   VCPKG_DETECTED_CMAKE_STRIP VCPKG_DETECTED_CMAKE_NM VCPKG_DETECTED_CMAKE_DLLTOOL VCPKG_DETECTED_CMAKE_RC_COMPILER)
@@ -462,7 +462,7 @@ function(vcpkg_configure_make)
                 z_vcpkg_append_to_configure_environment(configure_env CPP_FOR_BUILD "compile ${VCPKG_DETECTED_CMAKE_C_COMPILER} -E")
                 z_vcpkg_append_to_configure_environment(configure_env CXX_FOR_BUILD "compile ${VCPKG_DETECTED_CMAKE_CXX_COMPILER}")
             else()
-                # Silly trick to make configure accept CC_FOR_BUILD but in reallity CC_FOR_BUILD is deactivated.
+                # 用来让 configure 接受 CC_FOR_BUILD 的小技巧，但实际上 CC_FOR_BUILD 是被禁用的。
                 z_vcpkg_append_to_configure_environment(configure_env CC_FOR_BUILD "touch a.out | touch conftest${VCPKG_HOST_EXECUTABLE_SUFFIX} | true")
                 z_vcpkg_append_to_configure_environment(configure_env CPP_FOR_BUILD "touch a.out | touch conftest${VCPKG_HOST_EXECUTABLE_SUFFIX} | true")
                 z_vcpkg_append_to_configure_environment(configure_env CXX_FOR_BUILD "touch a.out | touch conftest${VCPKG_HOST_EXECUTABLE_SUFFIX} | true")
@@ -498,58 +498,58 @@ function(vcpkg_configure_make)
         endif()
         z_vcpkg_append_to_configure_environment(configure_env LD "${VCPKG_DETECTED_CMAKE_LINKER} -verbose")
         if(VCPKG_DETECTED_CMAKE_RANLIB)
-            z_vcpkg_append_to_configure_environment(configure_env RANLIB "${VCPKG_DETECTED_CMAKE_RANLIB}") # Trick to ignore the RANLIB call
+            z_vcpkg_append_to_configure_environment(configure_env RANLIB "${VCPKG_DETECTED_CMAKE_RANLIB}") # 忽略 RANLIB 调用的技巧
         else()
             z_vcpkg_append_to_configure_environment(configure_env RANLIB ":")
         endif()
-        if(VCPKG_DETECTED_CMAKE_OBJDUMP) #Objdump is required to make shared libraries. Otherwise define lt_cv_deplibs_check_method=pass_all
-            z_vcpkg_append_to_configure_environment(configure_env OBJDUMP "${VCPKG_DETECTED_CMAKE_OBJDUMP}") # Trick to ignore the RANLIB call
+        if(VCPKG_DETECTED_CMAKE_OBJDUMP) #Objdump 是制作共享库所必需的。否则定义 lt_cv_deplibs_check_method=pass_all
+            z_vcpkg_append_to_configure_environment(configure_env OBJDUMP "${VCPKG_DETECTED_CMAKE_OBJDUMP}") # 忽略 RANLIB 调用的技巧
         endif()
-        if(VCPKG_DETECTED_CMAKE_STRIP) # If required set the ENV variable STRIP in the portfile correctly
+        if(VCPKG_DETECTED_CMAKE_STRIP) # 如有需要，请在 portfile 中正确设置 ENV 变量 STRIP
             z_vcpkg_append_to_configure_environment(configure_env STRIP "${VCPKG_DETECTED_CMAKE_STRIP}")
         else()
             z_vcpkg_append_to_configure_environment(configure_env STRIP ":")
             list(APPEND arg_OPTIONS ac_cv_prog_ac_ct_STRIP=:)
         endif()
-        if(VCPKG_DETECTED_CMAKE_NM) # If required set the ENV variable NM in the portfile correctly
+        if(VCPKG_DETECTED_CMAKE_NM) # 如有需要，请在 portfile 中正确设置 ENV 变量 NM
             z_vcpkg_append_to_configure_environment(configure_env NM "${VCPKG_DETECTED_CMAKE_NM}")
         else()
-            # Would be better to have a true nm here! Some symbols (mainly exported variables) get not properly imported with dumpbin as nm
-            # and require __declspec(dllimport) for some reason (same problem CMake has with WINDOWS_EXPORT_ALL_SYMBOLS)
+            # 在这里有一个真正的 nm 会更好！一些符号（主要是导出的变量）使用 dumpbin 作为 nm 时无法正确导入
+            # 并且由于某些原因需要 __declspec(dllimport)（与 CMake 中 WINDOWS_EXPORT_ALL_SYMBOLS 的问题相同）
             z_vcpkg_append_to_configure_environment(configure_env NM "dumpbin.exe -symbols -headers")
         endif()
-        if(VCPKG_DETECTED_CMAKE_DLLTOOL) # If required set the ENV variable DLLTOOL in the portfile correctly
+        if(VCPKG_DETECTED_CMAKE_DLLTOOL) # 如有需要，请在 portfile 中正确设置 ENV 变量 DLLTOOL
             z_vcpkg_append_to_configure_environment(configure_env DLLTOOL "${VCPKG_DETECTED_CMAKE_DLLTOOL}")
         else()
             z_vcpkg_append_to_configure_environment(configure_env DLLTOOL "link.exe -verbose -dll")
         endif()
-        z_vcpkg_append_to_configure_environment(configure_env CCAS ":")   # If required set the ENV variable CCAS in the portfile correctly
-        z_vcpkg_append_to_configure_environment(configure_env AS ":")   # If required set the ENV variable AS in the portfile correctly
+        z_vcpkg_append_to_configure_environment(configure_env CCAS ":")   # 如有需要，请在 portfile 中正确设置 ENV 变量 CCAS
+        z_vcpkg_append_to_configure_environment(configure_env AS ":")   # 如有需要，请在 portfile 中正确设置 ENV 变量 AS
 
         foreach(_env IN LISTS arg_CONFIGURE_ENVIRONMENT_VARIABLES)
             z_vcpkg_append_to_configure_environment(configure_env ${_env} "${${_env}}")
         endforeach()
         debug_message("configure_env: '${configure_env}'")
-        # Other maybe interesting variables to control
-        # COMPILE This is the command used to actually compile a C source file. The file name is appended to form the complete command line.
-        # LINK This is the command used to actually link a C program.
-        # CXXCOMPILE The command used to actually compile a C++ source file. The file name is appended to form the complete command line.
-        # CXXLINK  The command used to actually link a C++ program.
+        # 其他可能有用的控制变量
+        # COMPILE 这是用于实际编译 C 源文件的命令。文件名被追加以形成完整的命令行。
+        # LINK 这是用于实际链接 C 程序的命令。
+        # CXXCOMPILE 用于实际编译 C++ 源文件的命令。文件名被追加以形成完整的命令行。
+        # CXXLINK  用于实际链接 C++ 程序的命令。
 
-        # Variables not correctly detected by configure. In release builds.
+        # configure 未正确检测的变量。在 release 构建中。
         list(APPEND arg_OPTIONS gl_cv_double_slash_root=yes
                                  ac_cv_func_memmove=yes)
-        #list(APPEND arg_OPTIONS lt_cv_deplibs_check_method=pass_all) # Just ignore libtool checks
+        #list(APPEND arg_OPTIONS lt_cv_deplibs_check_method=pass_all) # 直接忽略 libtool 检查
         if(VCPKG_TARGET_ARCHITECTURE MATCHES "^[Aa][Rr][Mm]64$")
             list(APPEND arg_OPTIONS gl_cv_host_cpu_c_abi=no)
-            # Currently needed for arm64 because objdump yields: "unrecognised machine type (0xaa64) in Import Library Format archive"
+            # arm64 目前需要此项，因为 objdump 输出: "unrecognised machine type (0xaa64) in Import Library Format archive"
             list(APPEND arg_OPTIONS lt_cv_deplibs_check_method=pass_all)
         elseif(VCPKG_TARGET_ARCHITECTURE MATCHES "^[Aa][Rr][Mm]$")
-            # Currently needed for arm because objdump yields: "unrecognised machine type (0x1c4) in Import Library Format archive"
+            # arm 目前需要此项，因为 objdump 输出: "unrecognised machine type (0x1c4) in Import Library Format archive"
             list(APPEND arg_OPTIONS lt_cv_deplibs_check_method=pass_all)
         endif()
     else()
-        # OSX dosn't like CMAKE_C(XX)_COMPILER (cc) in CC/CXX and rather wants to have gcc/g++
+        # OSX 不喜欢在 CC/CXX 中使用 CMAKE_C(XX)_COMPILER (cc)，而是更希望使用 gcc/g++
         vcpkg_list(SET z_vcm_all_tools)
         function(z_vcpkg_make_set_env envvar cmakevar)
             if(NOT VCPKG_DETECTED_CMAKE_${cmakevar})
@@ -592,39 +592,39 @@ function(vcpkg_configure_make)
     if(z_vcm_all_tools)
         list(REMOVE_DUPLICATES z_vcm_all_tools)
         list(JOIN z_vcm_all_tools "\n   " tools)
-        message(STATUS "Warning: Tools with embedded space may be handled incorrectly by configure:\n   ${tools}")
+        message(STATUS "警告: 工具路径中包含空格可能会被 configure 错误处理:\n   ${tools}")
     endif()
 
     z_vcpkg_configure_make_common_definitions()
 
-    # Cleanup previous build dirs
+    # 清理之前的构建目录
     file(REMOVE_RECURSE "${CURRENT_BUILDTREES_DIR}/${TARGET_TRIPLET}-${short_name_RELEASE}"
                         "${CURRENT_BUILDTREES_DIR}/${TARGET_TRIPLET}-${short_name_DEBUG}"
                         "${CURRENT_BUILDTREES_DIR}/${TARGET_TRIPLET}")
 
-    # Set configure paths
+    # 设置配置路径
     vcpkg_list(APPEND arg_OPTIONS_RELEASE "--prefix=${current_installed_dir_msys}")
     vcpkg_list(APPEND arg_OPTIONS_DEBUG "--prefix=${current_installed_dir_msys}${path_suffix_DEBUG}")
     if(NOT arg_NO_ADDITIONAL_PATHS)
-        # ${prefix} has an extra backslash to prevent early expansion when calling `bash -c configure "..."`.
+        # ${prefix} 有一个额外的反斜杠，以防止在调用 `bash -c configure "..."` 时提前展开。
         vcpkg_list(APPEND arg_OPTIONS_RELEASE
-                            # Important: These should all be relative to prefix!
+                            # 重要: 这些都应相对于 prefix！
                             "--bindir=\\\${prefix}/tools/${PORT}/bin"
                             "--sbindir=\\\${prefix}/tools/${PORT}/sbin"
-                            "--libdir=\\\${prefix}/lib" # On some Linux distributions lib64 is the default
-                            #"--includedir='\${prefix}'/include" # already the default!
+                            "--libdir=\\\${prefix}/lib" # 在某些 Linux 发行版中，lib64 是默认值
+                            #"--includedir='\${prefix}'/include" # 已经是默认值！
                             "--mandir=\\\${prefix}/share/${PORT}"
                             "--docdir=\\\${prefix}/share/${PORT}"
                             "--datarootdir=\\\${prefix}/share/${PORT}")
         vcpkg_list(APPEND arg_OPTIONS_DEBUG
-                            # Important: These should all be relative to prefix!
+                            # 重要: 这些都应相对于 prefix！
                             "--bindir=\\\${prefix}/../tools/${PORT}${path_suffix_DEBUG}/bin"
                             "--sbindir=\\\${prefix}/../tools/${PORT}${path_suffix_DEBUG}/sbin"
-                            "--libdir=\\\${prefix}/lib" # On some Linux distributions lib64 is the default
+                            "--libdir=\\\${prefix}/lib" # 在某些 Linux 发行版中，lib64 是默认值
                             "--includedir=\\\${prefix}/../include"
                             "--datarootdir=\\\${prefix}/share/${PORT}")
     endif()
-    # Setup common options
+    # 设置通用选项
     if(NOT arg_DISABLE_VERBOSE_FLAGS)
         list(APPEND arg_OPTIONS --disable-silent-rules --verbose)
     endif()
@@ -635,7 +635,7 @@ function(vcpkg_configure_make)
         list(APPEND arg_OPTIONS --disable-shared --enable-static)
     endif()
 
-    # Can be set in the triplet to append options for configure
+    # 可以在三元组中设置以追加 configure 选项
     if(DEFINED VCPKG_CONFIGURE_MAKE_OPTIONS)
         list(APPEND arg_OPTIONS ${VCPKG_CONFIGURE_MAKE_OPTIONS})
     endif()
@@ -648,49 +648,49 @@ function(vcpkg_configure_make)
 
     file(RELATIVE_PATH relative_build_path "${CURRENT_BUILDTREES_DIR}" "${arg_SOURCE_PATH}/${arg_PROJECT_SUBPATH}")
 
-    # Used by CL
+    # 用于 CL
     vcpkg_host_path_list(PREPEND ENV{INCLUDE} "${CURRENT_INSTALLED_DIR}/include")
-    # Used by GCC
+    # 用于 GCC
     vcpkg_host_path_list(PREPEND ENV{C_INCLUDE_PATH} "${CURRENT_INSTALLED_DIR}/include")
     vcpkg_host_path_list(PREPEND ENV{CPLUS_INCLUDE_PATH} "${CURRENT_INSTALLED_DIR}/include")
 
-    # Flags should be set in the toolchain instead (Setting this up correctly requires a function named vcpkg_determined_cmake_compiler_flags which can also be used to setup CC and CXX etc.)
+    # 标志应该在工具链中设置（正确设置需要一个名为 vcpkg_determined_cmake_compiler_flags 的函数，该函数也可用于设置 CC 和 CXX 等。）
     if(VCPKG_TARGET_IS_WINDOWS)
         vcpkg_backup_env_variables(VARS _CL_ _LINK_)
-        # TODO: Should be CPP flags instead -> rewrite when vcpkg_determined_cmake_compiler_flags defined
+        # TODO: 应该是 CPP 标志 -> 在定义 vcpkg_determined_cmake_compiler_flags 时重写
         if(VCPKG_TARGET_IS_UWP)
-            # Be aware that configure thinks it is crosscompiling due to:
+            # 请注意，configure 认为这是交叉编译，因为:
             # error while loading shared libraries: VCRUNTIME140D_APP.dll:
             # cannot open shared object file: No such file or directory
-            # IMPORTANT: The only way to pass linker flags through libtool AND the compile wrapper
-            # is to use the CL and LINK environment variables !!!
-            # (This is due to libtool and compiler wrapper using the same set of options to pass those variables around)
+            # 重要: 通过 libtool 和编译器 wrapper 传递链接器标志的唯一方式
+            # 是使用 CL 和 LINK 环境变量！！！
+            # （这是因为 libtool 和编译器 wrapper 使用相同的选项集来传递这些变量）
             file(TO_CMAKE_PATH "$ENV{VCToolsInstallDir}" VCToolsInstallDir)
             set(_replacement -FU\"${VCToolsInstallDir}/lib/x86/store/references/platform.winmd\")
             string(REPLACE "${_replacement}" "" VCPKG_DETECTED_CMAKE_CXX_FLAGS_DEBUG "${VCPKG_DETECTED_CMAKE_CXX_FLAGS_DEBUG}")
             string(REPLACE "${_replacement}" "" VCPKG_DETECTED_CMAKE_C_FLAGS_DEBUG "${VCPKG_DETECTED_CMAKE_C_FLAGS_DEBUG}")
             string(REPLACE "${_replacement}" "" VCPKG_DETECTED_CMAKE_CXX_FLAGS_RELEASE "${VCPKG_DETECTED_CMAKE_CXX_FLAGS_RELEASE}")
             string(REPLACE "${_replacement}" "" VCPKG_DETECTED_CMAKE_C_FLAGS_RELEASE "${VCPKG_DETECTED_CMAKE_C_FLAGS_RELEASE}")
-            # Can somebody please check if CMake's compiler flags for UWP are correct?
+            # 有人能检查一下 CMake 的 UWP 编译器标志是否正确吗？
             set(ENV{_CL_} "$ENV{_CL_} -FU\"${VCToolsInstallDir}/lib/x86/store/references/platform.winmd\"")
             set(ENV{_LINK_} "$ENV{_LINK_} ${VCPKG_DETECTED_CMAKE_C_STANDARD_LIBRARIES} ${VCPKG_DETECTED_CMAKE_CXX_STANDARD_LIBRARIES}")
         endif()
     endif()
 
-    # Remove outer quotes from cmake variables which will be forwarded via makefile/shell variables
-    # substituted into makefile commands (e.g. Android NDK has "--sysroot=...")
+    # 移除 cmake 变量的外层引号，这些变量将通过 makefile/shell 变量转发
+    # 并替换到 makefile 命令中（例如 Android NDK 有 "--sysroot=..."）
     separate_arguments(c_libs_list NATIVE_COMMAND "${VCPKG_DETECTED_CMAKE_C_STANDARD_LIBRARIES}")
     separate_arguments(cxx_libs_list NATIVE_COMMAND "${VCPKG_DETECTED_CMAKE_CXX_STANDARD_LIBRARIES}")
     list(REMOVE_ITEM cxx_libs_list ${c_libs_list})
     set(all_libs_list ${cxx_libs_list} ${c_libs_list})
-    #Do lib list transformation from name.lib to -lname if necessary
+    # 如有必要，将库名从 name.lib 转换为 -lname
     set(x_vcpkg_transform_libs ON)
     if(VCPKG_TARGET_IS_UWP)
         set(x_vcpkg_transform_libs OFF)
-        # Avoid libtool choke: "Warning: linker path does not have real file for library -lWindowsApp."
-        # The problem with the choke is that libtool always falls back to built a static library even if a dynamic was requested.
-        # Note: Env LIBPATH;LIB are on the search path for libtool by default on windows.
-        # It even does unix/dos-short/unix transformation with the path to get rid of spaces.
+        # 避免 libtool 噎住: "Warning: linker path does not have real file for library -lWindowsApp."
+        # 噎住的问题在于 libtool 总是回退到构建静态库，即使请求的是动态库。
+        # 注意: 环境变量 LIBPATH;LIB 默认在 Windows 上是 libtool 的搜索路径。
+        # 它甚至对路径进行 unix/dos-short/unix 转换以消除空格。
     endif()
     if(x_vcpkg_transform_libs)
         list(TRANSFORM all_libs_list REPLACE "[.](dll[.]lib|lib|a|so)$" "")
@@ -699,8 +699,8 @@ function(vcpkg_configure_make)
         endif()
         list(TRANSFORM all_libs_list REPLACE "^([^-].*)" "-l\\1")
         if(VCPKG_TARGET_IS_MINGW AND VCPKG_LIBRARY_LINKAGE STREQUAL "dynamic")
-            # libtool must be told explicitly that there is no dynamic linkage for uuid.
-            # The "-Wl,..." syntax is understood by libtool and gcc, but no by ld.
+            # 必须明确告诉 libtool uuid 没有动态链接。
+            # "-Wl,..." 语法被 libtool 和 gcc 理解，但不被 ld 理解。
             list(TRANSFORM all_libs_list REPLACE "^-luuid\$" "-Wl,-Bstatic,-luuid,-Bdynamic")
         endif()
     endif()
@@ -714,13 +714,13 @@ function(vcpkg_configure_make)
     endif()
     debug_message("ENV{LIBS}:$ENV{LIBS}")
 
-    # Run autoconf if necessary
+    # 如有必要，运行 autoconf
     if (arg_AUTOCONFIG OR requires_autoconfig AND NOT arg_NO_AUTOCONFIG)
         find_program(AUTORECONF autoreconf)
         if(NOT AUTORECONF)
-            message(FATAL_ERROR "${PORT} requires autoconf from the system package manager (example: \"sudo apt-get install autoconf\")")
+            message(FATAL_ERROR "${PORT} 需要从系统包管理器安装 autoconf（例如: \"sudo apt-get install autoconf\"）")
         endif()
-        message(STATUS "Generating configure for ${TARGET_TRIPLET}")
+        message(STATUS "正在为 ${TARGET_TRIPLET} 生成 configure")
         if (CMAKE_HOST_WIN32)
             vcpkg_execute_required_process(
                 COMMAND ${base_cmd} -c "autoreconf -vfi"

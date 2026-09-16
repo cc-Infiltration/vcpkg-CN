@@ -1,8 +1,8 @@
-function(z_vcpkg_check_features_last_feature out_var features_name features_list)
+﻿function(z_vcpkg_check_features_last_feature out_var features_name features_list)
     list(LENGTH features_list features_length)
     math(EXPR features_length_mod_2 "${features_length} % 2")
     if(NOT features_length_mod_2 EQUAL 0)
-        message(FATAL_ERROR "vcpkg_check_features has an incorrect number of arguments to ${features_name}")
+        message(FATAL_ERROR "vcpkg_check_features 传给 ${features_name} 的参数数量不正确")
     endif()
 
     math(EXPR last_feature "${features_length} / 2 - 1")
@@ -29,7 +29,7 @@ function(vcpkg_check_features)
     )
 
     if(NOT DEFINED arg_OUT_FEATURE_OPTIONS)
-        message(FATAL_ERROR "OUT_FEATURE_OPTIONS must be defined.")
+        message(FATAL_ERROR "OUT_FEATURE_OPTIONS 必须定义。")
     endif()
     if(NOT DEFINED arg_PREFIX)
         set(prefix "")
@@ -42,11 +42,11 @@ function(vcpkg_check_features)
 
     if(NOT DEFINED arg_FEATURES AND NOT DEFINED arg_INVERTED_FEATURES)
         message(DEPRECATION
-"calling `vcpkg_check_features` without the `FEATURES` keyword has been deprecated.
-    Please add the `FEATURES` keyword to the call.")
+"调用 `vcpkg_check_features` 时未使用 `FEATURES` 关键字的做法已弃用。
+    请在调用中添加 `FEATURES` 关键字。")
         set(arg_FEATURES "${arg_UNPARSED_ARGUMENTS}")
     elseif(DEFINED arg_UNPARSED_ARGUMENTS)
-        message(FATAL_ERROR "vcpkg_check_features called with unknown arguments: ${arg_UNPARSED_ARGUMENTS}")
+        message(FATAL_ERROR "vcpkg_check_features 调用时传入了未知参数：${arg_UNPARSED_ARGUMENTS}")
     endif()
 
 
@@ -87,7 +87,7 @@ function(vcpkg_check_features)
     set(last_variable)
     foreach(variable IN LISTS feature_variables)
         if(variable STREQUAL last_variable)
-            message("${Z_VCPKG_BACKCOMPAT_MESSAGE_LEVEL}" "vcpkg_check_features passed the same feature variable multiple times: '${variable}'")
+            message("${Z_VCPKG_BACKCOMPAT_MESSAGE_LEVEL}" "vcpkg_check_features 多次传入了相同的特性变量：'${variable}'")
         endif()
         set(last_variable ${variable})
     endforeach()

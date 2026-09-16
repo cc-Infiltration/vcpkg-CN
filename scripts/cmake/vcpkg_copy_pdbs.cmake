@@ -1,8 +1,8 @@
-function(vcpkg_copy_pdbs)
+﻿function(vcpkg_copy_pdbs)
     cmake_parse_arguments(PARSE_ARGV 0 "arg" "" "" "BUILD_PATHS")
 
     if(DEFINED arg_UNPARSED_ARGUMENTS)
-        message(WARNING "${CMAKE_CURRENT_FUNCTION} was passed extra arguments: ${arg_UNPARSED_ARGUMENTS}")
+        message(WARNING "${CMAKE_CURRENT_FUNCTION} 传入了多余的参数：${arg_UNPARSED_ARGUMENTS}")
     endif()
 
     if(NOT DEFINED arg_BUILD_PATHS)
@@ -41,7 +41,7 @@ function(vcpkg_copy_pdbs)
 
         if(NOT dlls_without_matching_pdbs STREQUAL "")
             list(JOIN dlls_without_matching_pdbs "\n    " message)
-            message(WARNING "Could not find a matching pdb file for:
+            message(WARNING "无法找到匹配的 pdb 文件：
     ${message}\n")
         endif()
     endif()

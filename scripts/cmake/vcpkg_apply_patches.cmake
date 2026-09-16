@@ -1,5 +1,5 @@
-function(vcpkg_apply_patches)
-    z_vcpkg_deprecation_message("vcpkg_apply_patches has been deprecated in favor of the `PATCHES` argument to `vcpkg_from_*`.")
+﻿function(vcpkg_apply_patches)
+    z_vcpkg_deprecation_message("vcpkg_apply_patches 已弃用，请改用 `vcpkg_from_*` 的 `PATCHES` 参数。")
 
     cmake_parse_arguments(PARSE_ARGV 0 "arg" "QUIET" "SOURCE_PATH" "PATCHES")
 

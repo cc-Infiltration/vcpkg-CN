@@ -1,9 +1,9 @@
 function(z_vcpkg_configure_cmake_both_or_neither_set var1 var2)
     if(DEFINED "${var1}" AND NOT DEFINED "${var2}")
-        message(FATAL_ERROR "If ${var1} is set, ${var2} must be set.")
+        message(FATAL_ERROR "如果设置了 ${var1}，则必须设置 ${var2}。")
     endif()
     if(NOT DEFINED "${var1}" AND DEFINED "${var2}")
-        message(FATAL_ERROR "If ${var2} is set, ${var1} must be set.")
+        message(FATAL_ERROR "如果设置了 ${var2}，则必须设置 ${var1}。")
     endif()
 endfunction()
 function(z_vcpkg_configure_cmake_build_cmakecache out_var whereat build_type)
@@ -19,13 +19,13 @@ function(z_vcpkg_get_visual_studio_generator)
     cmake_parse_arguments(PARSE_ARGV 0 arg "" "OUT_GENERATOR;OUT_ARCH" "")
 
     if (NOT DEFINED arg_OUT_GENERATOR)
-        message(FATAL_ERROR "OUT_GENERATOR must be defined.")
+        message(FATAL_ERROR "必须定义 OUT_GENERATOR。")
     endif()
     if(NOT DEFINED arg_OUT_ARCH)
-        message(FATAL_ERROR "OUT_ARCH must be defined.")
+        message(FATAL_ERROR "必须定义 OUT_ARCH。")
     endif()
     if(DEFINED arg_UNPARSED_ARGUMENTS)
-            message(FATAL_ERROR "${CMAKE_CURRENT_FUNCTION} was passed extra arguments: ${arg_UNPARSED_ARGUMENTS}")
+            message(FATAL_ERROR "${CMAKE_CURRENT_FUNCTION} 被传递了多余的参数: ${arg_UNPARSED_ARGUMENTS}")
     endif()
 
     if(DEFINED ENV{VisualStudioVersion})
@@ -73,14 +73,14 @@ function(vcpkg_configure_cmake)
     )
 
     if(NOT arg_Z_GET_CMAKE_VARS_USAGE AND Z_VCPKG_CMAKE_CONFIGURE_GUARD)
-        message(FATAL_ERROR "The ${PORT} port already depends on vcpkg-cmake; using both vcpkg-cmake and vcpkg_configure_cmake in the same port is unsupported.")
+        message(FATAL_ERROR "${PORT} 端口已依赖于 vcpkg-cmake；在同一端口中同时使用 vcpkg-cmake 和 vcpkg_configure_cmake 不受支持。")
     endif()
 
     if(DEFINED arg_UNPARSED_ARGUMENTS)
-        message(WARNING "${CMAKE_CURRENT_FUNCTION} was passed extra arguments: ${arg_UNPARSED_ARGUMENTS}")
+        message(WARNING "${CMAKE_CURRENT_FUNCTION} 被传递了多余的参数: ${arg_UNPARSED_ARGUMENTS}")
     endif()
     if(NOT DEFINED arg_SOURCE_PATH)
-        message(FATAL_ERROR "SOURCE_PATH must be specified")
+        message(FATAL_ERROR "必须指定 SOURCE_PATH")
     endif()
     if(NOT DEFINED arg_LOGNAME)
         set(arg_LOGNAME "config-${TARGET_TRIPLET}")
@@ -89,9 +89,9 @@ function(vcpkg_configure_cmake)
     vcpkg_list(SET manually_specified_variables)
 
     if(arg_Z_GET_CMAKE_VARS_USAGE)
-        set(configuring_message "Getting CMake variables for ${TARGET_TRIPLET}")
+        set(configuring_message "正在获取 ${TARGET_TRIPLET} 的 CMake 变量")
     else()
-        set(configuring_message "Configuring ${TARGET_TRIPLET}")
+        set(configuring_message "正在配置 ${TARGET_TRIPLET}")
 
         foreach(option IN LISTS arg_OPTIONS arg_OPTIONS_RELEASE arg_OPTIONS_DEBUG)
             if("${option}" MATCHES "^-D([^:=]*)[:=]")
@@ -102,11 +102,11 @@ function(vcpkg_configure_cmake)
         foreach(maybe_unused_var IN LISTS arg_MAYBE_UNUSED_VARIABLES)
             vcpkg_list(REMOVE_ITEM manually_specified_variables "${maybe_unused_var}")
         endforeach()
-        debug_message("manually specified variables: ${manually_specified_variables}")
+        debug_message("手动指定的变量: ${manually_specified_variables}")
     endif()
 
-    set(ninja_can_be_used ON) # Ninja as generator
-    set(ninja_host ON) # Ninja as parallel configurator
+    set(ninja_can_be_used ON) # Ninja 作为生成器
+    set(ninja_host ON) # Ninja 作为并行配置器
 
     if(NOT arg_PREFER_NINJA AND VCPKG_TARGET_IS_WINDOWS AND NOT VCPKG_TARGET_IS_MINGW)
         set(ninja_can_be_used OFF)
@@ -120,13 +120,13 @@ function(vcpkg_configure_cmake)
         endif()
 
         if("${host_arch}" STREQUAL "x86")
-            # Prebuilt ninja binaries are only provided for x64 hosts
+            # 预构建的 ninja 二进制文件仅提供给 x64 主机
             set(ninja_can_be_used OFF)
             set(ninja_host OFF)
         endif()
     endif()
 
-    set(generator "Ninja") # the default generator is always ninja!
+    set(generator "Ninja") # 默认生成器始终为 ninja！
     set(generator_arch "")
     if(DEFINED arg_GENERATOR)
         set(generator "${arg_GENERATOR}")
@@ -135,17 +135,17 @@ function(vcpkg_configure_cmake)
         z_vcpkg_get_visual_studio_generator(OUT_GENERATOR generator OUT_ARCH generator_arch)
         if("${generator}" STREQUAL "" OR "${generator_arch}" STREQUAL "")
             message(FATAL_ERROR
-                "Unable to determine appropriate generator for triplet ${TARGET_TRIPLET}:
+                "无法为三元组 ${TARGET_TRIPLET} 确定合适的生成器：
     ENV{VisualStudioVersion} : $ENV{VisualStudioVersion}
-    platform toolset: ${VCPKG_PLATFORM_TOOLSET}
-    architecture    : ${VCPKG_TARGET_ARCHITECTURE}")
+    平台工具集: ${VCPKG_PLATFORM_TOOLSET}
+    架构        : ${VCPKG_TARGET_ARCHITECTURE}")
         endif()
         if(DEFINED VCPKG_PLATFORM_TOOLSET)
             vcpkg_list(APPEND arg_OPTIONS "-T${VCPKG_PLATFORM_TOOLSET}")
         endif()
     endif()
 
-    # If we use Ninja, make sure it's on PATH
+    # 如果使用 Ninja，确保它在 PATH 中
     if("${generator}" STREQUAL "Ninja" AND NOT DEFINED ENV{VCPKG_FORCE_SYSTEM_BINARIES})
         vcpkg_find_acquire_program(NINJA)
         get_filename_component(ninja_path "${NINJA}" DIRECTORY)
@@ -180,8 +180,8 @@ function(vcpkg_configure_cmake)
         vcpkg_list(APPEND arg_OPTIONS -DBUILD_SHARED_LIBS=OFF)
     else()
         message(FATAL_ERROR
-            "Invalid setting for VCPKG_LIBRARY_LINKAGE: \"${VCPKG_LIBRARY_LINKAGE}\".
-    It must be \"static\" or \"dynamic\"")
+            "VCPKG_LIBRARY_LINKAGE 的设置无效: \"${VCPKG_LIBRARY_LINKAGE}\"。
+    它必须是 \"static\" 或 \"dynamic\"")
     endif()
 
     z_vcpkg_configure_cmake_both_or_neither_set(VCPKG_CXX_FLAGS_DEBUG VCPKG_C_FLAGS_DEBUG)
@@ -233,14 +233,14 @@ function(vcpkg_configure_cmake)
         vcpkg_list(APPEND arg_OPTIONS "-A${generator_arch}")
     endif()
 
-    # Sets configuration variables for macOS builds
+    # 为 macOS 构建设置配置变量
     foreach(config_var IN ITEMS INSTALL_NAME_DIR OSX_DEPLOYMENT_TARGET OSX_SYSROOT OSX_ARCHITECTURES)
         if(DEFINED "VCPKG_${config_var}")
             vcpkg_list(APPEND arg_OPTIONS "-DCMAKE_${config_var}=${VCPKG_${config_var}}")
         endif()
     endforeach()
 
-    # Allow overrides / additional configuration variables from triplets
+    # 允许从三元组覆盖/添加配置变量
     if(DEFINED VCPKG_CMAKE_CONFIGURE_OPTIONS)
         vcpkg_list(APPEND arg_OPTIONS ${VCPKG_CMAKE_CONFIGURE_OPTIONS})
     endif()
@@ -269,12 +269,12 @@ function(vcpkg_configure_cmake)
 
         vcpkg_find_acquire_program(NINJA)
         if(NOT DEFINED ninja_path)
-            # if ninja_path was defined above, we've already done this
+            # 如果 ninja_path 已在上面定义，我们已经完成了此操作
             get_filename_component(ninja_path "${NINJA}" DIRECTORY)
             vcpkg_add_to_path("${ninja_path}")
         endif()
 
-        #parallelize the configure step
+        #并行化配置步骤
         set(ninja_configure_contents
             "rule CreateProcess\n  command = \$process\n\n"
         )
@@ -334,27 +334,27 @@ function(vcpkg_configure_cmake)
         endif()
     endif()
 
-    # Check unused variables
+    # 检查未使用的变量
     vcpkg_list(SET all_unused_variables)
     foreach(config_log IN LISTS config_logs)
         if(NOT EXISTS "${config_log}")
             continue()
         endif()
         file(READ "${config_log}" log_contents)
-        debug_message("Reading configure log ${config_log}...")
+        debug_message("正在读取配置日志 ${config_log}...")
         if(NOT "${log_contents}" MATCHES "Manually-specified variables were not used by the project:\n\n((    [^\n]*\n)*)")
             continue()
         endif()
-        string(STRIP "${CMAKE_MATCH_1}" unused_variables) # remove leading `    ` and trailing `\n`
+        string(STRIP "${CMAKE_MATCH_1}" unused_variables) # 移除前导的 `    ` 和末尾的 `\n`
         string(REPLACE "\n    " ";" unused_variables "${unused_variables}")
-        debug_message("unused variables: ${unused_variables}")
+        debug_message("未使用的变量: ${unused_variables}")
 
         foreach(unused_variable IN LISTS unused_variables)
             if("${unused_variable}" IN_LIST manually_specified_variables)
-                debug_message("manually specified unused variable: ${unused_variable}")
+                debug_message("手动指定的未使用变量: ${unused_variable}")
                 vcpkg_list(APPEND all_unused_variables "${unused_variable}")
             else()
-                debug_message("unused variable (not manually specified): ${unused_variable}")
+                debug_message("未使用的变量（非手动指定）: ${unused_variable}")
             endif()
         endforeach()
     endforeach()
@@ -362,10 +362,10 @@ function(vcpkg_configure_cmake)
     if(NOT "${all_unused_variables}" STREQUAL "")
         vcpkg_list(REMOVE_DUPLICATES all_unused_variables)
         vcpkg_list(JOIN all_unused_variables "\n    " all_unused_variables)
-        message(WARNING "The following variables are not used in CMakeLists.txt:
+        message(WARNING "以下变量在 CMakeLists.txt 中未被使用：
     ${all_unused_variables}
-Please recheck them and remove the unnecessary options from the `vcpkg_configure_cmake` call.
-If these options should still be passed for whatever reason, please use the `MAYBE_UNUSED_VARIABLES` argument.")
+请重新检查并从 `vcpkg_configure_cmake` 调用中移除不必要的选项。
+如果出于某些原因仍需传递这些选项，请使用 `MAYBE_UNUSED_VARIABLES` 参数。")
     endif()
 
     if(NOT arg_Z_GET_CMAKE_VARS_USAGE)
