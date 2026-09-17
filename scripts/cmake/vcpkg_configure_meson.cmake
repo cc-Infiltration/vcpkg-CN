@@ -1,4 +1,4 @@
-function(z_vcpkg_meson_set_proglist_variables config_type)
+﻿function(z_vcpkg_meson_set_proglist_variables config_type)
     if(VCPKG_TARGET_IS_WINDOWS)
         set(proglist MT AR)
     else()
@@ -10,7 +10,7 @@ function(z_vcpkg_meson_set_proglist_variables config_type)
                 string(TOUPPER "MESON_${meson_${prog}}" var_to_set)
                 set("${var_to_set}" "${meson_${prog}} = ['${VCPKG_DETECTED_CMAKE_${prog}}']" PARENT_SCOPE)
             elseif(${prog} STREQUAL AR AND VCPKG_DETECTED_CMAKE_STATIC_LINKER_FLAGS_${config_type})
-                # Probably need to move AR somewhere else
+                # 可能需要将 AR 移到其他位置
                 string(TOLOWER "${prog}" proglower)
                 z_vcpkg_meson_convert_compiler_flags_to_list(ar_flags "${VCPKG_DETECTED_CMAKE_STATIC_LINKER_FLAGS_${config_type}}")
                 list(PREPEND ar_flags "${VCPKG_DETECTED_CMAKE_${prog}}")
@@ -35,11 +35,11 @@ function(z_vcpkg_meson_set_proglist_variables config_type)
             string(TOUPPER "MESON_${prog}" var_to_set)
             if(meson_${prog})
                 if(VCPKG_DETECTED_CMAKE_${prog}_FLAGS_${config_type})
-                    # Need compiler flags in prog vars for sanity check.
+                    # 健全性检查需要编译器标志在程序变量中。
                     z_vcpkg_meson_convert_compiler_flags_to_list(${prog}flags "${VCPKG_DETECTED_CMAKE_${prog}_FLAGS_${config_type}}")
                 endif()
                 list(PREPEND ${prog}flags "${VCPKG_DETECTED_CMAKE_${prog}_COMPILER}")
-                list(FILTER ${prog}flags EXCLUDE REGEX "(-|/)nologo") # Breaks compiler detection otherwise
+                list(FILTER ${prog}flags EXCLUDE REGEX "(-|/)nologo") # 否则会破坏编译器检测
                 z_vcpkg_meson_convert_list_to_python_array(${prog}flags ${${prog}flags})
                 set("${var_to_set}" "${meson_${prog}} = ${${prog}flags}" PARENT_SCOPE)
                 if (DEFINED VCPKG_DETECTED_CMAKE_${prog}_COMPILER_ID AND NOT VCPKG_DETECTED_CMAKE_${prog}_COMPILER_ID MATCHES "^(GNU|Intel)$")
@@ -48,11 +48,11 @@ function(z_vcpkg_meson_set_proglist_variables config_type)
                 endif()
             else()
                 if(VCPKG_DETECTED_CMAKE_${prog}_FLAGS_${config_type})
-                     # Need compiler flags in prog vars for sanity check.
+                     # 健全性检查需要编译器标志在程序变量中。
                     z_vcpkg_meson_convert_compiler_flags_to_list(${prog}flags "${VCPKG_DETECTED_CMAKE_${prog}_FLAGS_${config_type}}")
                 endif()
                 list(PREPEND ${prog}flags "${VCPKG_DETECTED_CMAKE_${prog}_COMPILER}")
-                list(FILTER ${prog}flags EXCLUDE REGEX "(-|/)nologo") # Breaks compiler detection otherwise
+                list(FILTER ${prog}flags EXCLUDE REGEX "(-|/)nologo") # 否则会破坏编译器检测
                 z_vcpkg_meson_convert_list_to_python_array(${prog}flags ${${prog}flags})
                 string(TOLOWER "${prog}" proglower)
                 set("${var_to_set}" "${proglower} = ${${prog}flags}" PARENT_SCOPE)
@@ -73,12 +73,12 @@ endfunction()
 
 function(z_vcpkg_meson_convert_list_to_python_array out_var)
     z_vcpkg_function_arguments(flag_list 1)
-    vcpkg_list(REMOVE_ITEM flag_list "") # remove empty elements if any
+    vcpkg_list(REMOVE_ITEM flag_list "") # 移除空元素（如果有）
     vcpkg_list(JOIN flag_list "', '" flag_list)
     set("${out_var}" "['${flag_list}']" PARENT_SCOPE)
 endfunction()
 
-# Generates the required compiler properties for meson
+# 为 meson 生成所需的编译器属性
 function(z_vcpkg_meson_set_flags_variables config_type)
     if(VCPKG_TARGET_IS_WINDOWS AND NOT VCPKG_TARGET_IS_MINGW)
         set(libpath_flag /LIBPATH:)
@@ -140,12 +140,12 @@ function(z_vcpkg_get_build_and_host_system build_system host_system is_cross) #h
             set(build_cpu armv7hl)
         else()
             if(NOT DEFINED VCPKG_MESON_CROSS_FILE OR NOT DEFINED VCPKG_MESON_NATIVE_FILE)
-                message(WARNING "Unsupported build architecture ${build_arch}! Please set VCPKG_MESON_(CROSS|NATIVE)_FILE to a meson file containing the build_machine entry!")
+                message(WARNING "不支持的构建架构 ${build_arch}！请将 VCPKG_MESON_(CROSS|NATIVE)_FILE 设置为包含 build_machine 条目的 meson 文件！")
             endif()
             set(build_unknown TRUE)
         endif()
     elseif(CMAKE_HOST_UNIX)
-        # at this stage, CMAKE_HOST_SYSTEM_PROCESSOR is not defined
+        # 在此阶段，CMAKE_HOST_SYSTEM_PROCESSOR 尚未定义
         execute_process(
             COMMAND uname -m
             OUTPUT_VARIABLE MACHINE
@@ -160,8 +160,8 @@ function(z_vcpkg_get_build_and_host_system build_system host_system is_cross) #h
                 COMMAND_ERROR_IS_FATAL ANY)
         endif()
 
-        # Show real machine architecture to visually understand whether we are in a native Apple Silicon terminal or running under Rosetta emulation
-        debug_message("Machine: ${MACHINE}")
+        # 显示真实机器架构，以便直观了解我们是在原生 Apple Silicon 终端中还是在 Rosetta 模拟下运行
+        debug_message("机器: ${MACHINE}")
 
         if(MACHINE MATCHES "arm64|aarch64")
             set(build_cpu_fam aarch64)
@@ -184,18 +184,18 @@ function(z_vcpkg_get_build_and_host_system build_system host_system is_cross) #h
         else()
             # https://github.com/mesonbuild/meson/blob/master/docs/markdown/Reference-tables.md#cpu-families
             if(NOT DEFINED VCPKG_MESON_CROSS_FILE OR NOT DEFINED VCPKG_MESON_NATIVE_FILE)
-                message(WARNING "Unhandled machine: ${MACHINE}! Please set VCPKG_MESON_(CROSS|NATIVE)_FILE to a meson file containing the build_machine entry!")
+                message(WARNING "未处理的机器: ${MACHINE}！请将 VCPKG_MESON_(CROSS|NATIVE)_FILE 设置为包含 build_machine 条目的 meson 文件！")
             endif()
             set(build_unknown TRUE)
         endif()
     else()
         if(NOT DEFINED VCPKG_MESON_CROSS_FILE OR NOT DEFINED VCPKG_MESON_NATIVE_FILE)
-            message(WARNING "Failed to detect the build architecture! Please set VCPKG_MESON_(CROSS|NATIVE)_FILE to a meson file containing the build_machine entry!")
+            message(WARNING "无法检测构建架构！请将 VCPKG_MESON_(CROSS|NATIVE)_FILE 设置为包含 build_machine 条目的 meson 文件！")
         endif()
         set(build_unknown TRUE)
     endif()
 
-    set(build "[build_machine]\n") # Machine the build is performed on
+    set(build "[build_machine]\n") # 执行构建的机器
     string(APPEND build "endian = 'little'\n")
     if(CMAKE_HOST_WIN32)
         string(APPEND build "system = 'windows'\n")
@@ -244,12 +244,12 @@ function(z_vcpkg_get_build_and_host_system build_system host_system is_cross) #h
         set(host_cpu wasm32)
     else()
         if(NOT DEFINED VCPKG_MESON_CROSS_FILE OR NOT DEFINED VCPKG_MESON_NATIVE_FILE)
-            message(WARNING "Unsupported target architecture ${VCPKG_TARGET_ARCHITECTURE}! Please set VCPKG_MESON_(CROSS|NATIVE)_FILE to a meson file containing the host_machine entry!" )
+            message(WARNING "不支持的目标架构 ${VCPKG_TARGET_ARCHITECTURE}！请将 VCPKG_MESON_(CROSS|NATIVE)_FILE 设置为包含 host_machine 条目的 meson 文件！" )
         endif()
         set(host_unkown TRUE)
     endif()
 
-    set(host "[host_machine]\n") # host=target in vcpkg.
+    set(host "[host_machine]\n") # 在 vcpkg 中 host=target。
     string(APPEND host "endian = 'little'\n")
     if(NOT VCPKG_CMAKE_SYSTEM_NAME OR VCPKG_TARGET_IS_MINGW OR VCPKG_TARGET_IS_UWP)
         set(meson_system_name "windows")
@@ -316,7 +316,7 @@ function(z_vcpkg_meson_setup_variables config_type)
 endfunction()
 
 function(vcpkg_configure_meson)
-    # parse parameters such that semicolons in options arguments to COMMAND don't get erased
+    # 解析参数，使得 COMMAND 选项参数中的分号不会被擦除
     cmake_parse_arguments(PARSE_ARGV 0 arg
         "NO_PKG_CONFIG"
         "SOURCE_PATH"
@@ -328,7 +328,7 @@ function(vcpkg_configure_meson)
     endif()
 
     if(DEFINED arg_ADDITIONAL_NATIVE_BINARIES OR DEFINED arg_ADDITIONAL_CROSS_BINARIES)
-        message(WARNING "Options ADDITIONAL_(NATIVE|CROSS)_BINARIES have been deprecated. Only use ADDITIONAL_BINARIES!")
+        message(WARNING "选项 ADDITIONAL_(NATIVE|CROSS)_BINARIES 已弃用。请只使用 ADDITIONAL_BINARIES！")
     endif()
 
     vcpkg_list(APPEND arg_ADDITIONAL_BINARIES ${arg_ADDITIONAL_NATIVE_BINARIES} ${arg_ADDITIONAL_CROSS_BINARIES})
@@ -342,13 +342,13 @@ function(vcpkg_configure_meson)
         z_vcpkg_select_default_vcpkg_chainload_toolchain()
     endif()
     z_vcpkg_get_cmake_vars(cmake_vars_file)
-    debug_message("Including cmake vars from: ${cmake_vars_file}")
+    debug_message("正在从以下位置包含 cmake 变量: ${cmake_vars_file}")
     include("${cmake_vars_file}")
 
     vcpkg_find_acquire_program(MESON)
 
     get_filename_component(CMAKE_PATH "${CMAKE_COMMAND}" DIRECTORY)
-    vcpkg_add_to_path("${CMAKE_PATH}" PREPEND) # Make CMake invokeable for Meson
+    vcpkg_add_to_path("${CMAKE_PATH}" PREPEND) # 使 CMake 可被 Meson 调用
 
     vcpkg_find_acquire_program(PYTHON3)
     get_filename_component(PYTHON3_DIR "${PYTHON3}" DIRECTORY)
@@ -356,7 +356,7 @@ function(vcpkg_configure_meson)
 
     vcpkg_find_acquire_program(NINJA)
     get_filename_component(NINJA_PATH ${NINJA} DIRECTORY)
-    vcpkg_add_to_path(PREPEND "${NINJA_PATH}") # Prepend to use the correct ninja.
+    vcpkg_add_to_path(PREPEND "${NINJA_PATH}") # 前置以使用正确的 ninja。
 
     set(buildtypes "")
     if(NOT DEFINED VCPKG_BUILD_TYPE OR VCPKG_BUILD_TYPE STREQUAL "debug")
@@ -379,8 +379,8 @@ function(vcpkg_configure_meson)
     z_vcpkg_get_build_and_host_system(MESON_HOST_MACHINE MESON_BUILD_MACHINE IS_CROSS)
 
     if(IS_CROSS)
-        # VCPKG_CROSSCOMPILING is not used since it regresses a lot of ports in x64-windows-x triplets
-        # For consistency this should proably be changed in the future?
+        # VCPKG_CROSSCOMPILING 未使用，因为它会导致 x64-windows-x 三元组中的许多端口出现回归
+        # 为了一致性，这可能在未来需要更改？
         vcpkg_list(APPEND arg_OPTIONS --native "${SCRIPTS}/buildsystems/meson/none.txt")
         vcpkg_list(APPEND arg_OPTIONS_DEBUG --cross "${meson_input_file_DEBUG}")
         vcpkg_list(APPEND arg_OPTIONS_RELEASE --cross "${meson_input_file_RELEASE}")
@@ -389,7 +389,7 @@ function(vcpkg_configure_meson)
         vcpkg_list(APPEND arg_OPTIONS_RELEASE --native "${meson_input_file_RELEASE}")
     endif()
 
-    # User provided cross/native files
+    # 用户提供的 cross/native 文件
     if(VCPKG_MESON_NATIVE_FILE)
         vcpkg_list(APPEND arg_OPTIONS_RELEASE --native "${VCPKG_MESON_NATIVE_FILE}")
     endif()
@@ -415,11 +415,11 @@ function(vcpkg_configure_meson)
         set(MESON_DEFAULT_LIBRARY static)
     endif()
 
-    vcpkg_list(APPEND arg_OPTIONS --libdir lib) # else meson install into an architecture describing folder
+    vcpkg_list(APPEND arg_OPTIONS --libdir lib) # 否则 meson 会安装到描述架构的文件夹中
     vcpkg_list(APPEND arg_OPTIONS_DEBUG -Ddebug=true --prefix "${CURRENT_PACKAGES_DIR}/debug" --includedir ../include)
     vcpkg_list(APPEND arg_OPTIONS_RELEASE -Ddebug=false --prefix "${CURRENT_PACKAGES_DIR}")
 
-    # select meson cmd-line options
+    # 选择 meson 命令行选项
     if(VCPKG_TARGET_IS_WINDOWS)
         vcpkg_list(APPEND arg_OPTIONS_DEBUG "-Dcmake_prefix_path=['${CURRENT_INSTALLED_DIR}/debug','${CURRENT_INSTALLED_DIR}','${CURRENT_INSTALLED_DIR}/share']")
         vcpkg_list(APPEND arg_OPTIONS_RELEASE "-Dcmake_prefix_path=['${CURRENT_INSTALLED_DIR}','${CURRENT_INSTALLED_DIR}/debug','${CURRENT_INSTALLED_DIR}/share']")
@@ -428,7 +428,7 @@ function(vcpkg_configure_meson)
         vcpkg_list(APPEND arg_OPTIONS_RELEASE "-Dcmake_prefix_path=['${CURRENT_INSTALLED_DIR}','${CURRENT_INSTALLED_DIR}/debug']")
     endif()
 
-    # Allow overrides / additional configuration variables from triplets
+    # 允许从三元组覆盖/添加配置变量
     if(DEFINED VCPKG_MESON_CONFIGURE_OPTIONS)
         vcpkg_list(APPEND arg_OPTIONS ${VCPKG_MESON_CONFIGURE_OPTIONS})
     endif()
@@ -439,11 +439,11 @@ function(vcpkg_configure_meson)
         vcpkg_list(APPEND arg_OPTIONS_DEBUG ${VCPKG_MESON_CONFIGURE_OPTIONS_DEBUG})
     endif()
 
-    # configure build
+    # 配置构建
     foreach(buildtype IN LISTS buildtypes)
-        message(STATUS "Configuring ${TARGET_TRIPLET}-${suffix_${buildtype}}")
+        message(STATUS "正在配置 ${TARGET_TRIPLET}-${suffix_${buildtype}}")
         file(MAKE_DIRECTORY "${CURRENT_BUILDTREES_DIR}/${TARGET_TRIPLET}-${suffix_${buildtype}}")
-        #setting up PKGCONFIG
+        #设置 PKGCONFIG
         if(NOT arg_NO_PKG_CONFIG)
             z_vcpkg_setup_pkgconfig_path(CONFIG "${buildtype}")
         endif()
@@ -461,7 +461,7 @@ function(vcpkg_configure_meson)
                 meson-logs/install-log.txt
         )
 
-        message(STATUS "Configuring ${TARGET_TRIPLET}-${suffix_${buildtype}} done")
+        message(STATUS "配置 ${TARGET_TRIPLET}-${suffix_${buildtype}} 完成")
 
         if(NOT arg_NO_PKG_CONFIG)
             z_vcpkg_restore_pkgconfig_path()

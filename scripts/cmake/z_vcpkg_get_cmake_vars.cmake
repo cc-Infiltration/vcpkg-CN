@@ -1,8 +1,8 @@
-function(z_vcpkg_get_cmake_vars out_file)
+﻿function(z_vcpkg_get_cmake_vars out_file)
     cmake_parse_arguments(PARSE_ARGV 1 arg "" "" "")
 
     if(DEFINED arg_UNPARSED_ARGUMENTS)
-        message(FATAL_ERROR "${CMAKE_CURRENT_FUNCTION} was passed extra arguments: ${arg_UNPARSED_ARGUMENTS}")
+        message(FATAL_ERROR "${CMAKE_CURRENT_FUNCTION} 被传入了多余的参数：${arg_UNPARSED_ARGUMENTS}")
     endif()
 
     if(DEFINED VCPKG_BUILD_TYPE)
@@ -14,14 +14,14 @@ function(z_vcpkg_get_cmake_vars out_file)
     endif()
     if(NOT DEFINED CACHE{${cache_var}})
         set(${cache_var}  "${cmake_vars_file}"
-            CACHE PATH "The file to include to access the CMake variables from a generated project.")
+            CACHE PATH "用于包含生成的项目中 CMake 变量的文件路径。")
         vcpkg_configure_cmake(
             SOURCE_PATH "${SCRIPTS}/get_cmake_vars"
             OPTIONS_DEBUG "-DVCPKG_OUTPUT_FILE:PATH=${CURRENT_BUILDTREES_DIR}/cmake-vars-${TARGET_TRIPLET}-dbg.cmake.log"
             OPTIONS_RELEASE "-DVCPKG_OUTPUT_FILE:PATH=${CURRENT_BUILDTREES_DIR}/cmake-vars-${TARGET_TRIPLET}-rel.cmake.log"
             PREFER_NINJA
             LOGNAME get-cmake-vars-${TARGET_TRIPLET}
-            Z_GET_CMAKE_VARS_USAGE # ignore vcpkg_cmake_configure, be quiet, don't set variables...
+            Z_GET_CMAKE_VARS_USAGE # 忽略 vcpkg_cmake_configure，保持静默，不设置变量...
         )
 
         set(include_string "")

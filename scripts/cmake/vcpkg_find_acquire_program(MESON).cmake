@@ -1,4 +1,4 @@
-set(program_name meson)
+﻿set(program_name meson)
 set(search_names meson meson.py)
 set(interpreter PYTHON3)
 set(apt_package_name "meson")
@@ -8,7 +8,7 @@ set(extra_search_args EXACT_VERSION_MATCH)
 if(EXISTS "${CURRENT_HOST_INSTALLED_DIR}/share/meson/version.txt")
     file(READ "${CURRENT_HOST_INSTALLED_DIR}/share/meson/version.txt" program_version)
     set(paths_to_search "${DOWNLOADS}/tools/meson-${program_version};${CURRENT_HOST_INSTALLED_DIR}/tools/meson")
-else() # Old behavior
+else() # 旧行为
     set(program_version 0.58.1)
     set(ref aeda7f249c4a5dbbecc52e44f382246a2377b5b0)
     set(paths_to_search "${DOWNLOADS}/tools/meson/meson-${ref}")

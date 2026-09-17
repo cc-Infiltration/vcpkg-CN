@@ -1,4 +1,4 @@
-function(vcpkg_execute_required_process)
+﻿function(vcpkg_execute_required_process)
     cmake_parse_arguments(PARSE_ARGV 0 arg
         "ALLOW_IN_DOWNLOAD_MODE;OUTPUT_STRIP_TRAILING_WHITESPACE;ERROR_STRIP_TRAILING_WHITESPACE"
         "WORKING_DIRECTORY;LOGNAME;TIMEOUT;OUTPUT_VARIABLE;ERROR_VARIABLE"
@@ -6,24 +6,24 @@ function(vcpkg_execute_required_process)
     )
 
     if(DEFINED arg_UNPARSED_ARGUMENTS)
-        message(WARNING "${CMAKE_CURRENT_FUNCTION} was passed extra arguments: ${arg_UNPARSED_ARGUMENTS}")
+        message(WARNING "${CMAKE_CURRENT_FUNCTION} 被传递了多余的参数: ${arg_UNPARSED_ARGUMENTS}")
     endif()
     foreach(required_arg IN ITEMS WORKING_DIRECTORY COMMAND)
         if(NOT DEFINED arg_${required_arg})
-            message(FATAL_ERROR "${required_arg} must be specified.")
+            message(FATAL_ERROR "必须指定 ${required_arg}。")
         endif()
     endforeach()
 
     if(NOT DEFINED arg_LOGNAME)
-        message(WARNING "LOGNAME should be specified.")
+        message(WARNING "应指定 LOGNAME。")
         set(arg_LOGNAME "required")
     endif()
 
     if (VCPKG_DOWNLOAD_MODE AND NOT arg_ALLOW_IN_DOWNLOAD_MODE)
         message(FATAL_ERROR
 [[
-This command cannot be executed in Download Mode.
-Halting portfile execution.
+此命令不能在下载模式下执行。
+正在终止 portfile 执行。
 ]])
     endif()
 
@@ -90,7 +90,7 @@ Halting portfile execution.
             set(expect_alias FALSE)
         elseif(item STREQUAL "ALIAS")
             if(NOT logfiles)
-                message(FATAL_ERROR "ALIAS used without source file")
+                message(FATAL_ERROR "ALIAS 在没有源文件的情况下使用")
             endif()
             set(expect_alias TRUE)
         else()
@@ -125,18 +125,18 @@ Halting portfile execution.
 
         z_vcpkg_prettify_command_line(pretty_command ${arg_COMMAND})
         message(FATAL_ERROR
-            "  Command failed: ${pretty_command}\n"
-            "  Working Directory: ${arg_WORKING_DIRECTORY}\n"
-            "  Error code: ${error_code}\n"
-            "  See logs for more information:\n"
+            "  命令失败: ${pretty_command}\n"
+            "  工作目录: ${arg_WORKING_DIRECTORY}\n"
+            "  错误码: ${error_code}\n"
+            "  有关更多信息，请查看日志:\n"
             "${stringified_logs}"
         )
     endif()
 
-    # pass output parameters back to caller's scope
+    # 将输出参数传回调用者的作用域
     if(output_and_error_same)
         z_vcpkg_forward_output_variable(arg_OUTPUT_VARIABLE out_err_var)
-        # arg_ERROR_VARIABLE = arg_OUTPUT_VARIABLE, so no need to set it again
+        # arg_ERROR_VARIABLE = arg_OUTPUT_VARIABLE，因此无需再次设置
     else()
         z_vcpkg_forward_output_variable(arg_OUTPUT_VARIABLE out_var)
         z_vcpkg_forward_output_variable(arg_ERROR_VARIABLE err_var)

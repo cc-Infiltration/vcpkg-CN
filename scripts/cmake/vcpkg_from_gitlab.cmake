@@ -88,7 +88,7 @@ function(vcpkg_from_gitlab)
 
 
     # 向调用者导出 VCPKG_HEAD_VERSION。这将在构建后被 ports.cmake 获取。
-    # 当多个 vcpkg_from_gitlab 连续使用时，只使用第一个（ hopefully 是主要的那个）的版本。
+    # 当多个 vcpkg_from_gitlab 连续使用时，只使用第一个（希望是主要的那个）的版本。
     if(VCPKG_USE_HEAD_VERSION AND NOT DEFINED VCPKG_HEAD_VERSION)
         z_uri_encode("${arg_REPO}" encoded_repo_path)
         set(version_url "${arg_GITLAB_URL}/api/v4/projects/${encoded_repo_path}/repository/branches/${arg_HEAD_REF}")

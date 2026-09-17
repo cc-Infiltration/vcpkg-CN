@@ -1,4 +1,4 @@
-set(program_name jom)
+﻿set(program_name jom)
 set(program_version_string 1_1_7)
 if(CMAKE_HOST_WIN32)
     set(download_urls

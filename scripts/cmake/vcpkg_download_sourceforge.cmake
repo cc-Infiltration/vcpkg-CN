@@ -37,26 +37,26 @@
     string(SUBSTRING "${arg_SHA512}" 0 10 sanitized_ref)
 
     set(sourceforge_mirrors
-        cfhcable        # United States
-        pilotfiber      # New York, NY
-        gigenet         # Chicago, IL
-        versaweb        # Las Vegas, NV
-        ayera           # Modesto, CA
-        netactuate      # Durham, NC
-        phoenixnap      # Tempe, AZ
-        astuteinternet  # Vancouver, BC
-        freefr          # Paris, France
-        netcologne      # Cologne, Germany
-        deac-riga       # Latvia
-        excellmedia     # Hyderabad, India
-        iweb            # Montreal, QC
-        jaist           # Nomi, Japan
-        jztkft          # Mezotur, Hungary
-        managedway      # Detroit, MI
-        nchc            # Taipei, Taiwan
-        netix           # Bulgaria
-        ufpr            # Curitiba, Brazil
-        tenet           # Wynberg, South Africa
+        cfhcable        # 美国
+        pilotfiber      # 纽约，纽约州
+        gigenet         # 芝加哥，伊利诺伊州
+        versaweb        # 拉斯维加斯，内华达州
+        ayera           # 莫德斯托，加利福尼亚州
+        netactuate      # 达勒姆，北卡罗来纳州
+        phoenixnap      # 坦佩，亚利桑那州
+        astuteinternet  # 温哥华，不列颠哥伦比亚省
+        freefr          # 巴黎，法国
+        netcologne      # 科隆，德国
+        deac-riga       # 拉脱维亚
+        excellmedia     # 海得拉巴，印度
+        iweb            # 蒙特利尔，魁北克省
+        jaist           # 能美，日本
+        jztkft          # Mezotur，匈牙利
+        managedway      # 底特律，密歇根州
+        nchc            # 台北，台湾
+        netix           # 保加利亚
+        ufpr            # 库里蒂巴，巴西
+        tenet           # 温伯格，南非
     )
     if(DEFINED SOURCEFORGE_MIRRORS AND NOT DEFINED VCPKG_SOURCEFORGE_EXTRA_MIRRORS)
         message(WARNING "扩展点 SOURCEFORGE_MIRRORS 已弃用。

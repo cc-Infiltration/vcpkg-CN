@@ -1,4 +1,4 @@
-set(program_name yasm)
+﻿set(program_name yasm)
 set(program_version 1.3.0.6.g1962)
 set(brew_package_name "yasm")
 set(apt_package_name "yasm")

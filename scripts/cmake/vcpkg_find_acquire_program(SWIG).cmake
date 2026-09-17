@@ -1,4 +1,4 @@
-set(program_version 4.3.1)
+﻿set(program_version 4.3.1)
 set(program_name swig)
 if(CMAKE_HOST_WIN32)
     set(download_filename "swigwin-${program_version}.zip")

@@ -1,4 +1,4 @@
-set(program_name gperf)
+﻿set(program_name gperf)
 set(program_version 3.0.1)
 if(CMAKE_HOST_WIN32)
     set(download_filename "gperf-${program_version}-bin.zip")

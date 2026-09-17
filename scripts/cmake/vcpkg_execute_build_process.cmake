@@ -1,4 +1,4 @@
-set(Z_VCPKG_EXECUTE_BUILD_PROCESS_RETRY_ERROR_MESSAGES
+﻿set(Z_VCPKG_EXECUTE_BUILD_PROCESS_RETRY_ERROR_MESSAGES
     "LINK : fatal error LNK1102:"
     " fatal error C1060: "
     # 链接器在执行期间内存不足。我们将禁用并行后重试一次。
@@ -62,13 +62,13 @@ function(vcpkg_execute_build_process)
         file(READ "${log_err}" err_contents)
         set(all_contents "${out_contents}${err_contents}")
         if(all_contents MATCHES "${Z_VCPKG_EXECUTE_BUILD_PROCESS_RETRY_ERROR_MESSAGES}")
-            message(WARNING "Please ensure your system has sufficient memory.")
+            message(WARNING "请确保您的系统有足够的内存。")
             set(log_out "${log_prefix}-out-1.log")
             set(log_err "${log_prefix}-err-1.log")
             list(APPEND all_logs "${log_out}" "${log_err}")
 
             if(DEFINED arg_NO_PARALLEL_COMMAND)
-                message(STATUS "Restarting build without parallelism")
+                message(STATUS "正在不带并行的方式重新构建")
                 execute_process(
                     COMMAND ${arg_NO_PARALLEL_COMMAND}
                     WORKING_DIRECTORY "${arg_WORKING_DIRECTORY}"
@@ -77,7 +77,7 @@ function(vcpkg_execute_build_process)
                     RESULT_VARIABLE error_code
                 )
             else()
-                message(STATUS "Restarting build")
+                message(STATUS "正在重新构建")
                 execute_process(
                     COMMAND ${arg_COMMAND}
                     WORKING_DIRECTORY "${arg_WORKING_DIRECTORY}"
@@ -87,10 +87,10 @@ function(vcpkg_execute_build_process)
                 )
             endif()
         elseif(all_contents MATCHES "mt(\\.exe)? : general error c101008d: ")
-            # Antivirus workaround - occasionally files are locked and cause mt.exe to fail
-            message(STATUS "mt.exe has failed. This may be the result of anti-virus. Disabling anti-virus on the buildtree folder may improve build speed")
+            # 杀毒软件的变通方案 - 文件偶尔会被锁定导致 mt.exe 失败
+            message(STATUS "mt.exe 已失败。这可能是杀毒软件导致的。在构建树文件夹上禁用杀毒软件可能会提高构建速度")
             foreach(iteration RANGE 1 3)
-                message(STATUS "Restarting Build ${TARGET_TRIPLET}-${SHORT_BUILDTYPE} because of mt.exe file locking issue. Iteration: ${iteration}")
+                message(STATUS "因 mt.exe 文件锁定问题，正在重新构建 ${TARGET_TRIPLET}-${SHORT_BUILDTYPE}。第 ${iteration} 次尝试")
 
                 set(log_out "${log_prefix}-out-${iteration}.log")
                 set(log_err "${log_prefix}-err-${iteration}.log")
@@ -132,9 +132,9 @@ function(vcpkg_execute_build_process)
         endforeach()
         z_vcpkg_prettify_command_line(pretty_command ${arg_COMMAND})
         message(FATAL_ERROR
-            "  Command failed: ${pretty_command}\n"
-            "  Working Directory: ${arg_WORKING_DIRECTORY}\n"
-            "  See logs for more information:\n"
+            "  命令失败: ${pretty_command}\n"
+            "  工作目录: ${arg_WORKING_DIRECTORY}\n"
+            "  有关更多信息，请查看日志:\n"
             "${stringified_logs}"
         )
     endif()

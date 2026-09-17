@@ -1,4 +1,4 @@
-macro(z_vcpkg_determine_autotools_host_cpu out_var)
+﻿macro(z_vcpkg_determine_autotools_host_cpu out_var)
     # TODO: 主机系统处理器架构可能与主机三元组目标架构不同
     if(DEFINED ENV{PROCESSOR_ARCHITEW6432})
         set(host_arch $ENV{PROCESSOR_ARCHITEW6432})
@@ -734,10 +734,10 @@ function(vcpkg_configure_make)
                 LOGNAME "autoconf-${TARGET_TRIPLET}"
             )
         endif()
-        message(STATUS "Finished generating configure for ${TARGET_TRIPLET}")
+        message(STATUS "已完成为 ${TARGET_TRIPLET} 生成 configure")
     endif()
     if(requires_autogen)
-        message(STATUS "Generating configure for ${TARGET_TRIPLET} via autogen.sh")
+        message(STATUS "正在通过 autogen.sh 为 ${TARGET_TRIPLET} 生成 configure")
         if (CMAKE_HOST_WIN32)
             vcpkg_execute_required_process(
                 COMMAND ${base_cmd} -c "./autogen.sh"
@@ -751,11 +751,11 @@ function(vcpkg_configure_make)
                 LOGNAME "autoconf-${TARGET_TRIPLET}"
             )
         endif()
-        message(STATUS "Finished generating configure for ${TARGET_TRIPLET}")
+        message(STATUS "已完成为 ${TARGET_TRIPLET} 生成 configure")
     endif()
 
     if (arg_PRERUN_SHELL)
-        message(STATUS "Prerun shell with ${TARGET_TRIPLET}")
+        message(STATUS "正在为 ${TARGET_TRIPLET} 运行前置 shell")
         if (CMAKE_HOST_WIN32)
             vcpkg_execute_required_process(
                 COMMAND ${base_cmd} -c "${arg_PRERUN_SHELL}"
@@ -783,7 +783,7 @@ function(vcpkg_configure_make)
     if(z_vcm_all_flags)
         list(REMOVE_DUPLICATES z_vcm_all_flags)
         list(JOIN z_vcm_all_flags "\n   " flags)
-        message(STATUS "Warning: Arguments with embedded space may be handled incorrectly by configure:\n   ${flags}")
+        message(STATUS "警告: 参数中嵌入的空格可能会被 configure 错误处理:\n   ${flags}")
     endif()
 
     foreach(var IN ITEMS arg_OPTIONS arg_OPTIONS_RELEASE arg_OPTIONS_DEBUG)
@@ -812,27 +812,27 @@ function(vcpkg_configure_make)
             set(relative_build_path .)
         endif()
 
-        # Setup PKG_CONFIG_PATH
+        # 设置 PKG_CONFIG_PATH
         z_vcpkg_setup_pkgconfig_path(CONFIG "${current_buildtype}")
 
-        # Setup environment
+        # 设置环境
         set(ENV{CPPFLAGS} "${CPPFLAGS_${current_buildtype}}")
         set(ENV{CPPFLAGS_FOR_BUILD} "${CPPFLAGS_${current_buildtype}}")
         set(ENV{CFLAGS} "${CFLAGS_${current_buildtype}}")
         set(ENV{CFLAGS_FOR_BUILD} "${CFLAGS_${current_buildtype}}")
         set(ENV{CXXFLAGS} "${CXXFLAGS_${current_buildtype}}")
-        #set(ENV{CXXFLAGS_FOR_BUILD} "${CXXFLAGS_${current_buildtype}}") -> doesn't exist officially
+        #set(ENV{CXXFLAGS_FOR_BUILD} "${CXXFLAGS_${current_buildtype}}") -> 官方不支持
         set(ENV{RCFLAGS} "${VCPKG_DETECTED_CMAKE_RC_FLAGS_${current_buildtype}}")
         set(ENV{LDFLAGS} "${LDFLAGS_${current_buildtype}}")
         set(ENV{LDFLAGS_FOR_BUILD} "${LDFLAGS_${current_buildtype}}")
         if(ARFLAGS_${current_buildtype} AND NOT (arg_USE_WRAPPERS AND VCPKG_TARGET_IS_WINDOWS))
-            # Target windows with wrappers enabled cannot forward ARFLAGS since it breaks the wrapper
+            # 目标为 windows 且启用了 wrapper 时无法转发 ARFLAGS，因为这会破坏 wrapper
             set(ENV{ARFLAGS} "${ARFLAGS_${current_buildtype}}")
         endif()
 
         set(env_cc_backup "$ENV{CC}")
         if(VCPKG_TARGET_IS_APPLE)
-            # configure not using all flags to check if compiler works ...
+            # configure 未使用所有标志来检查编译器是否工作...
             set(ENV{CC} "$ENV{CC} $ENV{CPPFLAGS} $ENV{CFLAGS}")
             set(ENV{CC_FOR_BUILD} "$ENV{CC_FOR_BUILD} $ENV{CPPFLAGS} $ENV{CFLAGS}")
         endif()
@@ -861,9 +861,9 @@ function(vcpkg_configure_make)
             set(path_backup $ENV{PATH})
             vcpkg_add_to_path("${CURRENT_INSTALLED_DIR}${path_suffix_${current_buildtype}}/bin")
         endif()
-        debug_message("Configure command:'${command}'")
+        debug_message("Configure 命令:'${command}'")
         if (NOT arg_SKIP_CONFIGURE)
-            message(STATUS "Configuring ${TARGET_TRIPLET}-${short_name_${current_buildtype}}")
+            message(STATUS "正在配置 ${TARGET_TRIPLET}-${short_name_${current_buildtype}}")
             vcpkg_execute_required_process(
                 COMMAND ${command}
                 WORKING_DIRECTORY "${target_dir}"
@@ -888,7 +888,7 @@ function(vcpkg_configure_make)
         if(arg_ADD_BIN_TO_PATH)
             set(ENV{PATH} "${path_backup}")
         endif()
-        # Restore environment (config dependent)
+        # 恢复环境（依赖于配置）
         if(VCPKG_TARGET_IS_APPLE)
             set(ENV{CC} "${env_cc_backup}")
         endif()
@@ -901,7 +901,7 @@ function(vcpkg_configure_make)
         endforeach()
     endforeach()
 
-    # Export matching make program for vcpkg_build_make (cache variable)
+    # 为 vcpkg_build_make 导出匹配的 make 程序（缓存变量）
     if(CMAKE_HOST_WIN32 AND MSYS_ROOT)
         find_program(Z_VCPKG_MAKE make PATHS "${MSYS_ROOT}/usr/bin" NO_DEFAULT_PATH REQUIRED)
     elseif(VCPKG_HOST_IS_BSD)
@@ -912,7 +912,7 @@ function(vcpkg_configure_make)
         find_program(Z_VCPKG_MAKE make REQUIRED)
     endif()
 
-    # Restore environment
+    # 恢复环境
     vcpkg_restore_env_variables(VARS ${cm_FLAGS} LIB LIBPATH LIBRARY_PATH LD_LIBRARY_PATH)
 
     set(_VCPKG_PROJECT_SOURCE_PATH ${arg_SOURCE_PATH} PARENT_SCOPE)

@@ -1,8 +1,8 @@
-function(vcpkg_install_meson)
+﻿function(vcpkg_install_meson)
     cmake_parse_arguments(PARSE_ARGV 0 arg "ADD_BIN_TO_PATH" "" "")
 
     vcpkg_find_acquire_program(NINJA)
-    unset(ENV{DESTDIR}) # installation directory was already specified with '--prefix' option
+    unset(ENV{DESTDIR}) # 安装目录已通过 '--prefix' 选项指定
 
     if(VCPKG_TARGET_IS_OSX)
         vcpkg_backup_env_variables(VARS SDKROOT MACOSX_DEPLOYMENT_TARGET)
@@ -21,7 +21,7 @@ function(vcpkg_install_meson)
             set(short_buildtype "rel")
         endif()
 
-        message(STATUS "Package ${TARGET_TRIPLET}-${short_buildtype}")
+        message(STATUS "正在打包 ${TARGET_TRIPLET}-${short_buildtype}")
         if(arg_ADD_BIN_TO_PATH)
             vcpkg_backup_env_variables(VARS PATH)
             if(buildtype STREQUAL "debug")
@@ -42,7 +42,7 @@ function(vcpkg_install_meson)
 
     vcpkg_list(SET renamed_libs)
     if(VCPKG_TARGET_IS_WINDOWS AND VCPKG_LIBRARY_LINKAGE STREQUAL static AND NOT VCPKG_TARGET_IS_MINGW)
-        # Meson names all static libraries lib<name>.a which basically breaks the world
+        # Meson 将所有静态库命名为 lib<name>.a，这基本上会破坏一切
         file(GLOB_RECURSE gen_libraries "${CURRENT_PACKAGES_DIR}*/**/lib*.a")
         foreach(gen_library IN LISTS gen_libraries)
             get_filename_component(libdir "${gen_library}" DIRECTORY)
@@ -50,7 +50,7 @@ function(vcpkg_install_meson)
             string(REGEX REPLACE ".a$" ".lib" fixed_librawname "${libname}")
             string(REGEX REPLACE "^lib" "" fixed_librawname "${fixed_librawname}")
             file(RENAME "${gen_library}" "${libdir}/${fixed_librawname}")
-            # For cmake fixes.
+            # 用于 cmake 修复。
             string(REGEX REPLACE ".a$" "" origin_librawname "${libname}")
             string(REGEX REPLACE ".lib$" "" fixed_librawname "${fixed_librawname}")
             vcpkg_list(APPEND renamed_libs ${fixed_librawname})

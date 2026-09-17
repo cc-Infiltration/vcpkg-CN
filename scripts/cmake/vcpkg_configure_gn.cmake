@@ -1,4 +1,4 @@
-function(z_vcpkg_configure_gn_generate)
+﻿function(z_vcpkg_configure_gn_generate)
     cmake_parse_arguments(PARSE_ARGV 0 "arg" "" "SOURCE_PATH;CONFIG;ARGS" "")
     if(DEFINED arg_UNPARSED_ARGUMENTS)
         message(FATAL_ERROR "内部错误: generate 被传递了多余的参数: ${arg_UNPARSED_ARGUMENTS}")

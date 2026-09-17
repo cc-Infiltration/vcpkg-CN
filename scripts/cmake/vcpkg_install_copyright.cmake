@@ -1,19 +1,19 @@
-function(vcpkg_install_copyright)
+﻿function(vcpkg_install_copyright)
     cmake_parse_arguments(PARSE_ARGV 0 arg "" "COMMENT" "FILE_LIST")
 
     if(DEFINED arg_UNPARSED_ARGUMENTS)
-        message(FATAL_ERROR "${CMAKE_CURRENT_FUNCTION} was passed extra arguments: ${arg_UNPARSED_ARGUMENTS}")
+        message(FATAL_ERROR "${CMAKE_CURRENT_FUNCTION} 被传递了多余的参数: ${arg_UNPARSED_ARGUMENTS}")
     endif()
 
     if(NOT DEFINED arg_FILE_LIST)
-        message(FATAL_ERROR "FILE_LIST must be specified")
+        message(FATAL_ERROR "必须指定 FILE_LIST")
     endif()
 
     list(LENGTH arg_FILE_LIST FILE_LIST_LENGTH)
     set(out_string "")
     
     if(FILE_LIST_LENGTH LESS_EQUAL 0)
-        message(FATAL_ERROR "FILE_LIST must contain at least one file")
+        message(FATAL_ERROR "FILE_LIST 必须至少包含一个文件")
     elseif(FILE_LIST_LENGTH EQUAL 1)
         if(arg_COMMENT)
             file(READ "${arg_FILE_LIST}" out_string)
@@ -24,7 +24,7 @@ function(vcpkg_install_copyright)
     else()
         foreach(file_item IN LISTS arg_FILE_LIST)
             if(NOT EXISTS "${file_item}")
-                message(FATAL_ERROR "\n${CMAKE_CURRENT_FUNCTION} was passed a non-existing path: ${file_item}\n")
+                message(FATAL_ERROR "\n${CMAKE_CURRENT_FUNCTION} 被传递了不存在的路径: ${file_item}\n")
             endif()
 
             get_filename_component(file_name "${file_item}" NAME)

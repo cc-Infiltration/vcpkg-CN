@@ -1,4 +1,4 @@
-set(program_name doxygen)
+﻿set(program_name doxygen)
 set(program_version 1.9.8)
 string(REPLACE "." "_" program_version_dir "Release_${program_version}")
 if(CMAKE_HOST_WIN32)

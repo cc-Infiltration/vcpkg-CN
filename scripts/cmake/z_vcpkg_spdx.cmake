@@ -1,10 +1,10 @@
-function(z_vcpkg_add_spdx_resource)
+﻿function(z_vcpkg_add_spdx_resource)
     cmake_parse_arguments(PARSE_ARGV 0 "arg"
         ""
         "NAME;DOWNLOAD_LOCATION;SHA512;FILENAME"
         "")
     if(DEFINED arg_UNPARSED_ARGUMENTS)
-        message(FATAL_ERROR "z_vcpkg_add_spdx_resource was passed extra arguments: ${arg_UNPARSED_ARGUMENTS}")
+        message(FATAL_ERROR "z_vcpkg_add_spdx_resource 被传入了多余的参数：${arg_UNPARSED_ARGUMENTS}")
     endif()
 
     get_property(Z_VCPKG_SPDX_OBJECTS GLOBAL PROPERTY Z_VCPKG_SPDX_OBJECTS)

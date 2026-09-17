@@ -1,4 +1,4 @@
-set(program_name scons)
+﻿set(program_name scons)
 set(program_version 4.10.1)
 set(interpreter PYTHON3)
 set(search_names "scons.py")

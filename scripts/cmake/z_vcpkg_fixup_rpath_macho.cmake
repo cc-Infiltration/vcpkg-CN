@@ -1,11 +1,11 @@
-function(z_vcpkg_calculate_corrected_macho_rpath)
+﻿function(z_vcpkg_calculate_corrected_macho_rpath)
     cmake_parse_arguments(PARSE_ARGV 0 "arg"
       ""
       "MACHO_FILE_DIR;OUT_NEW_RPATH_VAR"
       "")
 
     if(DEFINED arg_UNPARSED_ARGUMENTS)
-        message(FATAL_ERROR "${CMAKE_CURRENT_FUNCTION} was passed extra arguments: ${arg_UNPARSED_ARGUMENTS}")
+        message(FATAL_ERROR "${CMAKE_CURRENT_FUNCTION} 被传入了多余的参数：${arg_UNPARSED_ARGUMENTS}")
     endif()
 
     set(current_prefix "${CURRENT_PACKAGES_DIR}")
@@ -16,9 +16,9 @@ function(z_vcpkg_calculate_corrected_macho_rpath)
         set(current_installed_prefix "${CURRENT_INSTALLED_DIR}/debug")
     endif()
 
-    # compute path relative to lib
+    # 计算相对于 lib 的路径
     file(RELATIVE_PATH relative_to_lib "${arg_MACHO_FILE_DIR}" "${current_prefix}/lib")
-    # remove trailing slash
+    # 移除末尾斜杠
     string(REGEX REPLACE "/+$" "" relative_to_lib "${relative_to_lib}")
 
     if(NOT relative_to_lib STREQUAL "")
@@ -40,11 +40,11 @@ function(z_vcpkg_regex_escape)
 endfunction()
 
 function(z_vcpkg_fixup_macho_rpath_in_dir)
-    # We need to iterate through everything because we
-    # can't predict where a Mach-O file will be located
+    # 我们需要遍历所有内容，因为我们
+    # 无法预测 Mach-O 文件的位置
     file(GLOB root_entries LIST_DIRECTORIES TRUE "${CURRENT_PACKAGES_DIR}/*")
 
-    # Skip some folders for better throughput
+    # 跳过部分文件夹以提高处理效率
     list(APPEND folders_to_skip "include")
     list(JOIN folders_to_skip "|" folders_to_skip_regex)
     set(folders_to_skip_regex "^(${folders_to_skip_regex})$")
@@ -52,21 +52,21 @@ function(z_vcpkg_fixup_macho_rpath_in_dir)
     find_program(
         install_name_tool_cmd
         NAMES install_name_tool
-        DOC "Absolute path of install_name_tool cmd"
+        DOC "install_name_tool 命令的绝对路径"
         REQUIRED
     )
 
     find_program(
         otool_cmd
         NAMES otool
-        DOC "Absolute path of otool cmd"
+        DOC "otool 命令的绝对路径"
         REQUIRED
     )
 
     find_program(
         file_cmd
         NAMES file
-        DOC "Absolute path of file cmd"
+        DOC "file 命令的绝对路径"
         REQUIRED
       )
 
@@ -89,7 +89,7 @@ function(z_vcpkg_fixup_macho_rpath_in_dir)
                 continue()
             endif()
 
-            # Determine if the file is a Mach-O executable or shared library
+            # 判断该文件是否为 Mach-O 可执行文件或共享库
             execute_process(
                 COMMAND "${file_cmd}" -b "${macho_file}"
                 OUTPUT_VARIABLE file_output
@@ -100,7 +100,7 @@ function(z_vcpkg_fixup_macho_rpath_in_dir)
             elseif(file_output MATCHES ".*Mach-O.*executable.*")
                 set(file_type "executable")
             else()
-                debug_message("File `${macho_file}` reported as `${file_output}` is not a Mach-O file")
+                debug_message("文件 `${macho_file}` 报告为 `${file_output}`，不是 Mach-O 文件")
                 continue()
             endif()
 
@@ -115,17 +115,17 @@ function(z_vcpkg_fixup_macho_rpath_in_dir)
             )
 
             if("${file_type}" STREQUAL "shared")
-                # Set the install name for shared libraries
+                # 为共享库设置安装名
                 execute_process(
                     COMMAND "${otool_cmd}" -D "${macho_file}"
                     OUTPUT_VARIABLE get_id_ov
                     RESULT_VARIABLE get_id_rv
                 )
                 if(NOT get_id_rv EQUAL 0)
-                    message(FATAL_ERROR "Could not obtain install name id from '${macho_file}'")
+                    message(FATAL_ERROR "无法从 '${macho_file}' 获取安装名 ID")
                 endif()
                 set(macho_new_id "@rpath/${macho_file_name}")
-                message(STATUS "Setting install name id of '${macho_file}' to '@rpath/${macho_file_name}'")
+                message(STATUS "正在将 '${macho_file}' 的安装名 ID 设置为 '@rpath/${macho_file_name}'")
                 execute_process(
                     COMMAND "${install_name_tool_cmd}" -id "${macho_new_id}" "${macho_file}"
                     OUTPUT_QUIET
@@ -133,27 +133,27 @@ function(z_vcpkg_fixup_macho_rpath_in_dir)
                     RESULT_VARIABLE set_id_exit_code
                 )
                 if(NOT "${set_id_error}" STREQUAL "" AND NOT set_id_exit_code EQUAL 0)
-                    message(WARNING "Couldn't adjust install name of '${macho_file}': ${set_id_error}")
+                    message(WARNING "无法调整 '${macho_file}' 的安装名：${set_id_error}")
                     continue()
                 endif()
 
-                # otool -D <macho_file> typically returns lines like:
+                # otool -D <macho_file> 通常返回如下格式的行：
 
                 # <macho_file>:
                 # <id>
 
-                # But also with ARM64 binaries, it can return:
+                # 但对于 ARM64 二进制文件，它也可能返回：
                 # <macho_file> (architecture arm64):
                 # <id>
 
-                # Either way we need to remove the first line and trim the trailing newline char.
+                # 无论哪种情况，我们都需要移除第一行并去除末尾的换行符。
                 string(REGEX REPLACE "[^\n]+:\n" "" get_id_ov "${get_id_ov}")
                 string(REGEX REPLACE "\n.*" "" get_id_ov "${get_id_ov}")
                 list(APPEND adjusted_shared_lib_old_ids "${get_id_ov}")
                 list(APPEND adjusted_shared_lib_new_ids "${macho_new_id}")
             endif()
 
-            # List all existing rpaths
+            # 列出所有现有的 rpath
             execute_process(
                 COMMAND "${otool_cmd}" -l "${macho_file}"
                 OUTPUT_VARIABLE get_rpath_ov
@@ -161,9 +161,9 @@ function(z_vcpkg_fixup_macho_rpath_in_dir)
             )
 
             if(NOT get_rpath_rv EQUAL 0)
-                message(FATAL_ERROR "Could not obtain rpath list from '${macho_file}'")
+                message(FATAL_ERROR "无法从 '${macho_file}' 获取 rpath 列表")
             endif()
-            # Extract the LC_RPATH load commands and extract the paths
+            # 提取 LC_RPATH 加载命令并提取路径
             string(REGEX REPLACE "[^\n]+cmd LC_RPATH\n[^\n]+\n[^\n]+path ([^\n]+) \\(offset[^\n]+\n" "rpath \\1\n" get_rpath_ov "${get_rpath_ov}")
             string(REGEX MATCHALL "rpath [^\n]+" get_rpath_ov "${get_rpath_ov}")
             string(REGEX REPLACE "rpath " "" rpath_list "${get_rpath_ov}")
@@ -182,7 +182,7 @@ function(z_vcpkg_fixup_macho_rpath_in_dir)
                 continue()
             endif()
 
-            # Set the new rpath
+            # 设置新的 rpath
             execute_process(
                 COMMAND "${install_name_tool_cmd}" ${rpath_args} "${macho_file}"
                 OUTPUT_QUIET
@@ -191,16 +191,16 @@ function(z_vcpkg_fixup_macho_rpath_in_dir)
             )
 
             if(NOT "${set_rpath_error}" STREQUAL "" AND NOT set_rpath_exit_code EQUAL 0)
-                message(WARNING "Couldn't adjust RPATH of '${macho_file}': ${set_rpath_error}")
+                message(WARNING "无法调整 '${macho_file}' 的 RPATH：${set_rpath_error}")
                 continue()
             endif()
 
-            message(STATUS "Adjusted RPATH of '${macho_file}' to '${new_rpath}'")
+            message(STATUS "已将 '${macho_file}' 的 RPATH 调整为 '${new_rpath}'")
         endforeach()
     endforeach()
 
-    # Check for dependent libraries in executables and shared libraries that
-    # need adjusting after id change
+    # 检查可执行文件和共享库中的依赖库，
+    # 这些库在 ID 变更后需要调整
     list(LENGTH adjusted_shared_lib_old_ids last_adjusted_index)
     if(NOT last_adjusted_index EQUAL 0)
         math(EXPR last_adjusted_index "${last_adjusted_index} - 1")
@@ -211,9 +211,9 @@ function(z_vcpkg_fixup_macho_rpath_in_dir)
                 RESULT_VARIABLE get_deps_rv
             )
             if(NOT get_deps_rv EQUAL 0)
-                message(FATAL_ERROR "Could not obtain dependencies list from '${macho_file}'")
+                message(FATAL_ERROR "无法从 '${macho_file}' 获取依赖列表")
             endif()
-            # change adjusted_shared_lib_old_ids[i] -> adjusted_shared_lib_new_ids[i]
+            # 将 adjusted_shared_lib_old_ids[i] 替换为 adjusted_shared_lib_new_ids[i]
             foreach(i RANGE ${last_adjusted_index})
                 list(GET adjusted_shared_lib_old_ids ${i} adjusted_old_id)
                 z_vcpkg_regex_escape(
@@ -225,7 +225,7 @@ function(z_vcpkg_fixup_macho_rpath_in_dir)
                 endif()
                 list(GET adjusted_shared_lib_new_ids ${i} adjusted_new_id)
 
-                # Replace the old id with the new id
+                # 用新的 ID 替换旧的 ID
                 execute_process(
                     COMMAND "${install_name_tool_cmd}" -change "${adjusted_old_id}" "${adjusted_new_id}" "${macho_file}"
                     OUTPUT_QUIET
@@ -233,10 +233,10 @@ function(z_vcpkg_fixup_macho_rpath_in_dir)
                     RESULT_VARIABLE change_id_exit_code
                 )
                 if(NOT "${change_id_error}" STREQUAL "" AND NOT change_id_exit_code EQUAL 0)
-                    message(WARNING "Couldn't adjust dependent shared library install name in '${macho_file}': ${change_id_error}")
+                    message(WARNING "无法调整 '${macho_file}' 中依赖共享库的安装名：${change_id_error}")
                     continue()
                 endif()
-                message(STATUS "Adjusted dependent shared library install name in '${macho_file}' (From '${adjusted_old_id}' -> To '${adjusted_new_id}')")
+                message(STATUS "已调整 '${macho_file}' 中依赖共享库的安装名（从 '${adjusted_old_id}' -> 到 '${adjusted_new_id}'）")
             endforeach()
         endforeach()
     endif()

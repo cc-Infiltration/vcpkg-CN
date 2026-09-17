@@ -1,24 +1,24 @@
-function(vcpkg_minimum_required)
+﻿function(vcpkg_minimum_required)
     cmake_parse_arguments(PARSE_ARGV 0 arg "" "VERSION" "")
     if(NOT DEFINED VCPKG_BASE_VERSION)
-        message(FATAL_ERROR "Your vcpkg executable is outdated and is not compatible with the current CMake scripts.
-    Please re-acquire vcpkg by running bootstrap-vcpkg."
+        message(FATAL_ERROR "您的 vcpkg 可执行文件已过时，与当前的 CMake 脚本不兼容。
+    请通过运行 bootstrap-vcpkg 重新获取 vcpkg。"
         )
     endif()
     if(NOT DEFINED arg_VERSION)
-        message(FATAL_ERROR "VERSION must be specified")
+        message(FATAL_ERROR "必须指定 VERSION")
     endif()
 
     set(vcpkg_date_regex "^[12][0-9][0-9][0-9]-[01][0-9]-[0-3][0-9]$")
     if(NOT "${VCPKG_BASE_VERSION}" MATCHES "${vcpkg_date_regex}")
         message(FATAL_ERROR
-            "vcpkg internal failure; VCPKG_BASE_VERSION (${VCPKG_BASE_VERSION}) was not a valid date."
+            "vcpkg 内部错误；VCPKG_BASE_VERSION (${VCPKG_BASE_VERSION}) 不是有效的日期。"
         )
     endif()
 
     if(NOT "${arg_VERSION}" MATCHES "${vcpkg_date_regex}")
         message(FATAL_ERROR
-            "VERSION (${arg_VERSION}) was not a valid date - expected something of the form 'YYYY-MM-DD'"
+            "VERSION (${arg_VERSION}) 不是有效的日期 - 需要格式为 'YYYY-MM-DD' 的值"
         )
     endif()
 
@@ -27,9 +27,9 @@ function(vcpkg_minimum_required)
 
     if("${VCPKG_BASE_VERSION_as_dotted}" VERSION_LESS "${arg_VERSION_as_dotted}")
         message(FATAL_ERROR
-            "Your vcpkg executable is from ${VCPKG_BASE_VERSION} which is older than required by the caller "
-            "of vcpkg_minimum_required(VERSION ${arg_VERSION}). "
-            "Please re-acquire vcpkg by running bootstrap-vcpkg."
+            "您的 vcpkg 可执行文件版本为 ${VCPKG_BASE_VERSION}，早于调用者通过 "
+            "vcpkg_minimum_required(VERSION ${arg_VERSION}) 所要求的版本。"
+            "请通过运行 bootstrap-vcpkg 重新获取 vcpkg。"
         )
     endif()
 endfunction()

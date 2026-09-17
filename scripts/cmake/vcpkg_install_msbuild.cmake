@@ -1,4 +1,4 @@
-function(vcpkg_install_msbuild)
+﻿function(vcpkg_install_msbuild)
     cmake_parse_arguments(
         PARSE_ARGV 0
         "arg"
@@ -8,7 +8,7 @@ function(vcpkg_install_msbuild)
     )
 
     if(DEFINED arg_UNPARSED_ARGUMENTS)
-        message(WARNING "vcpkg_install_msbuild was passed extra arguments: ${arg_UNPARSED_ARGUMENTS}")
+        message(WARNING "vcpkg_install_msbuild 被传递了多余的参数: ${arg_UNPARSED_ARGUMENTS}")
     endif()
 
     if(NOT DEFINED arg_RELEASE_CONFIGURATION)
@@ -27,7 +27,7 @@ function(vcpkg_install_msbuild)
         elseif(VCPKG_TARGET_ARCHITECTURE STREQUAL "arm64")
             set(arg_PLATFORM arm64)
         else()
-            message(FATAL_ERROR "Unsupported target architecture")
+            message(FATAL_ERROR "不支持的目标架构")
         endif()
     endif()
     if(NOT DEFINED arg_PLATFORM_TOOLSET)
@@ -57,8 +57,8 @@ function(vcpkg_install_msbuild)
     )
 
     if(VCPKG_LIBRARY_LINKAGE STREQUAL "static")
-        # Disable LTCG for static libraries because this setting introduces ABI incompatibility between minor compiler versions
-        # TODO: Add a way for the user to override this if they want to opt-in to incompatibility
+        # 对静态库禁用 LTCG，因为此设置会在编译器次要版本之间引入 ABI 不兼容性
+        # TODO: 为用户添加一种选择加入此不兼容性的方式
         list(APPEND arg_OPTIONS "/p:WholeProgramOptimization=false")
     endif()
 
@@ -71,7 +71,7 @@ function(vcpkg_install_msbuild)
 
     get_filename_component(source_path_suffix "${arg_SOURCE_PATH}" NAME)
     if(NOT DEFINED VCPKG_BUILD_TYPE OR VCPKG_BUILD_TYPE STREQUAL "release")
-        message(STATUS "Building ${arg_PROJECT_SUBPATH} for Release")
+        message(STATUS "正在为 Release 构建 ${arg_PROJECT_SUBPATH}")
         file(REMOVE_RECURSE "${CURRENT_BUILDTREES_DIR}/${TARGET_TRIPLET}-rel")
         file(MAKE_DIRECTORY "${CURRENT_BUILDTREES_DIR}/${TARGET_TRIPLET}-rel")
         file(COPY "${arg_SOURCE_PATH}" DESTINATION "${CURRENT_BUILDTREES_DIR}/${TARGET_TRIPLET}-rel")
@@ -100,7 +100,7 @@ function(vcpkg_install_msbuild)
     endif()
 
     if(NOT DEFINED VCPKG_BUILD_TYPE OR VCPKG_BUILD_TYPE STREQUAL "debug")
-        message(STATUS "Building ${arg_PROJECT_SUBPATH} for Debug")
+        message(STATUS "正在为 Debug 构建 ${arg_PROJECT_SUBPATH}")
         file(REMOVE_RECURSE "${CURRENT_BUILDTREES_DIR}/${TARGET_TRIPLET}-dbg")
         file(MAKE_DIRECTORY "${CURRENT_BUILDTREES_DIR}/${TARGET_TRIPLET}-dbg")
         file(COPY "${arg_SOURCE_PATH}" DESTINATION "${CURRENT_BUILDTREES_DIR}/${TARGET_TRIPLET}-dbg")
@@ -149,7 +149,7 @@ function(vcpkg_install_msbuild)
                 file(REMOVE ${root_includes})
             elseif(arg_ALLOW_ROOT_INCLUDES)
             else()
-                message(FATAL_ERROR "Top-level files were found in ${CURRENT_PACKAGES_DIR}/include; this may indicate a problem with the call to `vcpkg_install_msbuild()`.\nTo avoid conflicts with other libraries, it is recommended to not put includes into the root `include/` directory.\nPass either ALLOW_ROOT_INCLUDES or REMOVE_ROOT_INCLUDES to handle these files.\n")
+                message(FATAL_ERROR "在 ${CURRENT_PACKAGES_DIR}/include 中发现了顶层文件；这可能表明调用 `vcpkg_install_msbuild()` 时存在问题。\n为避免与其他库冲突，建议不要将头文件放在根 `include/` 目录中。\n请传递 ALLOW_ROOT_INCLUDES 或 REMOVE_ROOT_INCLUDES 来处理这些文件。\n")
             endif()
         endif()
     endif()

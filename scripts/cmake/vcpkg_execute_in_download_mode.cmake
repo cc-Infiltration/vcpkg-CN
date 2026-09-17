@@ -1,5 +1,5 @@
-function(vcpkg_execute_in_download_mode)
-    # this allows us to grab the value of the output variables, but pass through the rest of the arguments
+﻿function(vcpkg_execute_in_download_mode)
+    # 这允许我们获取输出变量的值，同时传递其余参数
     cmake_parse_arguments(PARSE_ARGV 0 arg "" "RESULT_VARIABLE;RESULTS_VARIABLE;OUTPUT_VARIABLE;ERROR_VARIABLE" "")
 
     set(output_and_error_same OFF)

@@ -1,4 +1,4 @@
-function(vcpkg_install_qmake)
+﻿function(vcpkg_install_qmake)
     z_vcpkg_function_arguments(args)
 
     vcpkg_build_qmake(${args})
@@ -24,7 +24,7 @@ function(vcpkg_install_qmake)
         "${CURRENT_BUILDTREES_DIR}/${TARGET_TRIPLET}-dbg/*.dll"
     )
     if("${release_libs}" STREQUAL "" AND "${debug_libs}" STREQUAL "")
-        message(FATAL_ERROR "Build did not appear to produce any libraries. If this is intended, use `vcpkg_build_qmake()` directly.")
+        message(FATAL_ERROR "构建似乎没有生成任何库。如果这是有意的，请直接使用 `vcpkg_build_qmake()`。")
     endif()
     if(NOT "${release_libs}" STREQUAL "")
         file(MAKE_DIRECTORY "${CURRENT_PACKAGES_DIR}/lib")

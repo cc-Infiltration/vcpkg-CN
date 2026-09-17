@@ -1,4 +1,4 @@
-list(APPEND Z_VCPKG_ACQUIRE_MSYS_DECLARE_PACKAGE_COMMANDS "z_vcpkg_find_fortran_declare_msys_packages")
+﻿list(APPEND Z_VCPKG_ACQUIRE_MSYS_DECLARE_PACKAGE_COMMANDS "z_vcpkg_find_fortran_declare_msys_packages")
 
 function(vcpkg_find_fortran out_var)
     if("${ARGC}" GREATER "1")
@@ -33,7 +33,7 @@ function(vcpkg_find_fortran out_var)
                 PACKAGES mingw-w64-x86_64-gcc-fortran
             )
         else()
-            message(FATAL_ERROR "Unknown architecture '${VCPKG_TARGET_ARCHITECTURE}' for MinGW Fortran build!")
+            message(FATAL_ERROR "未知的架构 '${VCPKG_TARGET_ARCHITECTURE}'，无法用于 MinGW Fortran 构建！")
         endif()
 
         set(mingw_bin "${msys_root}/${mingw_path}/bin")
@@ -44,32 +44,32 @@ function(vcpkg_find_fortran out_var)
             "-DCMAKE_C_COMPILER=${mingw_bin}/gcc.exe"
             "-DCMAKE_Fortran_FLAGS_INIT:STRING= -mabi=ms ${machine_flag} ${VCPKG_Fortran_FLAGS}")
 
-        # This is for private use by vcpkg-gfortran
+        # 这是 vcpkg-gfortran 的私有用途
         set(vcpkg_find_fortran_MSYS_ROOT "${msys_root}" PARENT_SCOPE)
         set(VCPKG_USE_INTERNAL_Fortran TRUE PARENT_SCOPE)
         set(VCPKG_POLICY_SKIP_DUMPBIN_CHECKS enabled PARENT_SCOPE)
-        set(VCPKG_CHAINLOAD_TOOLCHAIN_FILE "${SCRIPTS}/toolchains/mingw.cmake" PARENT_SCOPE) # Switching to MinGW toolchain for Fortran
+        set(VCPKG_CHAINLOAD_TOOLCHAIN_FILE "${SCRIPTS}/toolchains/mingw.cmake" PARENT_SCOPE) # 切换到 MinGW 工具链以使用 Fortran
         if(VCPKG_CRT_LINKAGE STREQUAL "static")
             set(VCPKG_CRT_LINKAGE dynamic PARENT_SCOPE)
-            message(STATUS "VCPKG_CRT_LINKAGE linkage for ${PORT} using vcpkg's internal gfortran cannot be static due to linking against MinGW libraries. Forcing dynamic CRT linkage")
+            message(STATUS "${PORT} 使用 vcpkg 内部 gfortran 时的 VCPKG_CRT_LINKAGE 链接方式不能为静态，因为需要链接 MinGW 库。强制使用动态 CRT 链接")
         endif()
         if(VCPKG_LIBRARY_LINKAGE STREQUAL "static")
             set(VCPKG_LIBRARY_LINKAGE dynamic PARENT_SCOPE)
-            message(STATUS "VCPKG_LIBRARY_LINKAGE linkage for ${PORT} using vcpkg's internal gfortran cannot be static due to linking against MinGW libraries. Forcing dynamic library linkage")
+            message(STATUS "${PORT} 使用 vcpkg 内部 gfortran 时的 VCPKG_LIBRARY_LINKAGE 链接方式不能为静态，因为需要链接 MinGW 库。强制使用动态库链接")
         endif()
     elseif(CMAKE_HOST_WIN32)
-        message(STATUS "Deferring Fortran compiler selection to the triplet toolchain.")
+        message(STATUS "将 Fortran 编译器的选择推迟到三元组工具链。")
     else()
         include(CMakeDetermineFortranCompiler)
         if(NOT CMAKE_Fortran_COMPILER)
-            message(FATAL_ERROR "Unable to find a Fortran compiler using 'CMakeDetermineFortranCompiler'. Please install one (e.g. gfortran) and make it available on the PATH!")
+            message(FATAL_ERROR "无法使用 'CMakeDetermineFortranCompiler' 找到 Fortran 编译器。请安装一个（例如 gfortran）并确保其在 PATH 中可用！")
         endif()
     endif()
     set("${out_var}" "${additional_cmake_args}" PARENT_SCOPE)
 endfunction()
 
 macro(z_vcpkg_find_fortran_msys_declare_packages)
-    # primary package for x86
+    # x86 的主要包
     z_vcpkg_acquire_msys_declare_package(
         URL "https://mirror.msys2.org/mingw/mingw32/mingw-w64-i686-gcc-fortran-15.2.0-8-any.pkg.tar.zst"
         SHA512 141bb2f0a71b636ea21839396f430015f06a387bf86ff6c001699487fa07e369120ff7ad81448dff8a4ca362b4e6740d2d7ae39347614245ef5546e8506a6463
@@ -163,7 +163,7 @@ macro(z_vcpkg_find_fortran_msys_declare_packages)
         DEPS mingw-w64-i686-gcc-libs
     )
 
-    # primary package for x64
+    # x64 的主要包
     z_vcpkg_acquire_msys_declare_package(
         URL "https://mirror.msys2.org/mingw/mingw64/mingw-w64-x86_64-gcc-fortran-15.2.0-8-any.pkg.tar.zst"
         SHA512 8b05c50499a9aa55e68dc8f165af7010ae62667564eecf45466f1ade0795269730fd05c616811b5e9480733281fe0842de54b4e1aed90c89ec33858eb08ae327

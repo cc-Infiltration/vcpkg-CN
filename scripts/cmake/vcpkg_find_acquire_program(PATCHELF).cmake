@@ -1,4 +1,4 @@
-set(program_name patchelf)
+﻿set(program_name patchelf)
 if(CMAKE_HOST_SYSTEM_NAME STREQUAL "Linux")
     set(program_version 0.19.0)
     vcpkg_execute_in_download_mode(COMMAND "uname" "-m" OUTPUT_VARIABLE HOST_ARCH OUTPUT_STRIP_TRAILING_WHITESPACE)

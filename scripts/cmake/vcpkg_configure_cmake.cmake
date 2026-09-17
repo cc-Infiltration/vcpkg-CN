@@ -1,4 +1,4 @@
-function(z_vcpkg_configure_cmake_both_or_neither_set var1 var2)
+﻿function(z_vcpkg_configure_cmake_both_or_neither_set var1 var2)
     if(DEFINED "${var1}" AND NOT DEFINED "${var2}")
         message(FATAL_ERROR "如果设置了 ${var1}，则必须设置 ${var2}。")
     endif()

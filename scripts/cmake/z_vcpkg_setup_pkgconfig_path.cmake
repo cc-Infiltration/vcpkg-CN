@@ -1,11 +1,11 @@
-function(z_vcpkg_setup_pkgconfig_path)
+﻿function(z_vcpkg_setup_pkgconfig_path)
     cmake_parse_arguments(PARSE_ARGV 0 "arg" "" "CONFIG" "")
 
     if("${arg_CONFIG}" STREQUAL "")
-        message(FATAL_ERROR "CONFIG is required.")
+        message(FATAL_ERROR "CONFIG 参数是必需的。")
     endif()
     if(DEFINED arg_UNPARSED_ARGUMENTS)
-        message(FATAL_ERROR "${CMAKE_CURRENT_FUNCTION} was passed extra arguments: ${arg_UNPARSED_ARGUMENTS}")
+        message(FATAL_ERROR "${CMAKE_CURRENT_FUNCTION} 被传入了多余的参数：${arg_UNPARSED_ARGUMENTS}")
     endif()
 
     foreach(envvar IN ITEMS PKG_CONFIG PKG_CONFIG_PATH)
@@ -32,21 +32,21 @@ function(z_vcpkg_setup_pkgconfig_path)
         vcpkg_host_path_list(PREPEND ENV{PKG_CONFIG_PATH} "${prefix}/share/pkgconfig")
         if(arg_CONFIG STREQUAL "RELEASE")
             vcpkg_host_path_list(PREPEND ENV{PKG_CONFIG_PATH} "${prefix}/lib/pkgconfig")
-            # search order is lib, share, external
+            # 搜索顺序为 lib、share、外部
         elseif(arg_CONFIG STREQUAL "DEBUG")
             vcpkg_host_path_list(PREPEND ENV{PKG_CONFIG_PATH} "${prefix}/debug/lib/pkgconfig")
-            # search order is debug/lib, share, external
+            # 搜索顺序为 debug/lib、share、外部
         else()
-            message(FATAL_ERROR "CONFIG must be either RELEASE or DEBUG.")
+            message(FATAL_ERROR "CONFIG 必须为 RELEASE 或 DEBUG。")
         endif()
     endforeach()
-    # total search order is current packages dir, current installed dir, external
+    # 总搜索顺序为当前包目录、当前安装目录、外部
 endfunction()
 
 function(z_vcpkg_restore_pkgconfig_path)
     cmake_parse_arguments(PARSE_ARGV 0 "arg" "" "" "")
     if(DEFINED arg_UNPARSED_ARGUMENTS)
-        message(FATAL_ERROR "${CMAKE_CURRENT_FUNCTION} was passed extra arguments: ${arg_UNPARSED_ARGUMENTS}")
+        message(FATAL_ERROR "${CMAKE_CURRENT_FUNCTION} 被传入了多余的参数：${arg_UNPARSED_ARGUMENTS}")
     endif()
 
     foreach(envvar IN ITEMS PKG_CONFIG PKG_CONFIG_PATH)

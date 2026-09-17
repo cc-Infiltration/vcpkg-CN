@@ -1,8 +1,8 @@
-function(z_vcpkg_apply_patches)
+﻿function(z_vcpkg_apply_patches)
     cmake_parse_arguments(PARSE_ARGV 0 "arg" "QUIET" "SOURCE_PATH" "PATCHES")
 
     if(DEFINED arg_UNPARSED_ARGUMENTS)
-        message(FATAL_ERROR "internal error: z_vcpkg_apply_patches was passed extra arguments: ${arg_UNPARSED_ARGUMENTS}")
+        message(FATAL_ERROR "内部错误：z_vcpkg_apply_patches 被传入了多余的参数：${arg_UNPARSED_ARGUMENTS}")
     endif()
 
     find_program(GIT NAMES git git.cmd REQUIRED)
@@ -16,7 +16,7 @@ function(z_vcpkg_apply_patches)
     set(patchnum 0)
     foreach(patch IN LISTS arg_PATCHES)
         get_filename_component(absolute_patch "${patch}" ABSOLUTE BASE_DIR "${CURRENT_PORT_DIR}")
-        message(STATUS "Applying patch ${patch}")
+        message(STATUS "正在应用补丁 ${patch}")
         set(logname "patch-${TARGET_TRIPLET}-${patchnum}")
         vcpkg_execute_in_download_mode(
             COMMAND "${GIT}" -c core.longpaths=true -c core.autocrlf=false -c core.filemode=true --work-tree=. --git-dir=.git apply "${absolute_patch}" --ignore-whitespace --whitespace=nowarn --verbose
@@ -29,9 +29,9 @@ function(z_vcpkg_apply_patches)
 
         if(error_code)
             if(arg_QUIET)
-                message(STATUS "Applying patch ${patch} - failure silenced")
+                message(STATUS "应用补丁 ${patch} - 失败已被静默处理")
             else()
-                message(FATAL_ERROR "Applying patch failed: ${error}")
+                message(FATAL_ERROR "应用补丁失败：${error}")
             endif()
         endif()
 

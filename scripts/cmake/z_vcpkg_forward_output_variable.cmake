@@ -1,6 +1,6 @@
-macro(z_vcpkg_forward_output_variable ptr_to_parent_var var_to_forward)
+﻿macro(z_vcpkg_forward_output_variable ptr_to_parent_var var_to_forward)
     if("${ARGC}" GREATER "2")
-        message(FATAL_ERROR "z_vcpkg_forward_output_variable was passed extra arguments: ${ARGN}")
+        message(FATAL_ERROR "z_vcpkg_forward_output_variable 被传入了多余的参数：${ARGN}")
     endif()
     if(DEFINED "${ptr_to_parent_var}")
         if(DEFINED "${var_to_forward}")

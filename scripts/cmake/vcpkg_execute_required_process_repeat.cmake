@@ -1,4 +1,4 @@
-function(vcpkg_execute_required_process_repeat)
+﻿function(vcpkg_execute_required_process_repeat)
     cmake_parse_arguments(PARSE_ARGV 0 arg
         "ALLOW_IN_DOWNLOAD_MODE"
         "COUNT;WORKING_DIRECTORY;LOGNAME"
@@ -6,24 +6,24 @@ function(vcpkg_execute_required_process_repeat)
     )
 
     if(DEFINED arg_UNPARSED_ARGUMENTS)
-        message(WARNING "${CMAKE_CURRENT_FUNCTION} was passed extra arguments: ${arg_UNPARSED_ARGUMENTS}")
+        message(WARNING "${CMAKE_CURRENT_FUNCTION} 被传递了多余的参数: ${arg_UNPARSED_ARGUMENTS}")
     endif()
     foreach(required_arg IN ITEMS COUNT WORKING_DIRECTORY LOGNAME COMMAND)
         if(NOT DEFINED arg_${required_arg})
-            message(FATAL_ERROR "${required_arg} must be specified.")
+            message(FATAL_ERROR "必须指定 ${required_arg}。")
         endif()
     endforeach()
 
-    # also checks for COUNT being an integer
+    # 同时检查 COUNT 是否为整数
     if(NOT arg_COUNT GREATER_EQUAL "1")
-        message(FATAL_ERROR "COUNT (${arg_COUNT}) must be greater than or equal to 1.")
+        message(FATAL_ERROR "COUNT (${arg_COUNT}) 必须大于或等于 1。")
     endif()
 
     if (DEFINED VCPKG_DOWNLOAD_MODE AND NOT arg_ALLOW_IN_DOWNLOAD_MODE)
         message(FATAL_ERROR
 [[
-This command cannot be executed in Download Mode.
-Halting portfile execution.
+此命令不能在下载模式下执行。
+正在终止 portfile 执行。
 ]])
     endif()
 
@@ -63,9 +63,9 @@ Halting portfile execution.
 
     z_vcpkg_prettify_command_line(pretty_command ${arg_COMMAND})
     message(FATAL_ERROR
-        "  Command failed: ${pretty_command}\n"
-        "  Working Directory: ${arg_WORKING_DIRECTORY}\n"
-        "  See logs for more information:\n"
+        "  命令失败: ${pretty_command}\n"
+        "  工作目录: ${arg_WORKING_DIRECTORY}\n"
+        "  有关更多信息，请查看日志:\n"
         "${stringified_logs}"
     )
 endfunction()

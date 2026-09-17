@@ -1,4 +1,4 @@
-set(program_name nasm)
+﻿set(program_name nasm)
 set(program_version 3.01)
 set(brew_package_name "nasm")
 set(apt_package_name "nasm")

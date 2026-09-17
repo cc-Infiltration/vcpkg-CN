@@ -1,10 +1,10 @@
-function(vcpkg_replace_string filename match replace)
+﻿function(vcpkg_replace_string filename match replace)
     cmake_parse_arguments(PARSE_ARGV 3 "arg" "REGEX;IGNORE_UNCHANGED" "" "")
     if(arg_REGEX)
         set(arg_REGEX "REGEX")
     else()
         if("${match}" STREQUAL "${replace}")
-            return() # Avoid reading the file or triggering warnings
+            return() # 避免读取文件或触发警告
         endif()
 
         set(arg_REGEX "")
@@ -14,7 +14,7 @@ function(vcpkg_replace_string filename match replace)
     string(${arg_REGEX} REPLACE "${match}" "${replace}" contents "${contents}")
     string(SHA512 after_hash "${contents}")
     if(NOT arg_IGNORE_UNCHANGED AND "${before_hash}" STREQUAL "${after_hash}")
-        message("${Z_VCPKG_BACKCOMPAT_MESSAGE_LEVEL}" "vcpkg_replace_string made no changes.")
+        message("${Z_VCPKG_BACKCOMPAT_MESSAGE_LEVEL}" "vcpkg_replace_string 未进行任何更改。")
     endif()
     file(WRITE "${filename}" "${contents}")
 endfunction()

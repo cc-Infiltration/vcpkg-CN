@@ -1,1 +1,1 @@
-z_use_vcpkg_fetch(NUGET)
+﻿z_use_vcpkg_fetch(NUGET)

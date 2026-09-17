@@ -1,4 +1,4 @@
-set(program_name bazel)
+﻿set(program_name bazel)
 set(program_version 4.2.2)
 set(rename_binary_to "bazel")
 if(CMAKE_HOST_SYSTEM_NAME STREQUAL "Linux")

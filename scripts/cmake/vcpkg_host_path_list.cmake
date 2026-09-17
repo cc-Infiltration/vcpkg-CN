@@ -1,19 +1,19 @@
-function(vcpkg_host_path_list)
+﻿function(vcpkg_host_path_list)
     if("${ARGC}" LESS "2")
-        message(FATAL_ERROR "vcpkg_host_path_list requires at least two arguments.")
+        message(FATAL_ERROR "vcpkg_host_path_list 至少需要两个参数。")
     endif()
 
     if("${ARGV1}" MATCHES "^ARGV([0-9]*)$|^ARG[CN]$|^CMAKE_CURRENT_FUNCTION|^CMAKE_MATCH_")
-        message(FATAL_ERROR "vcpkg_host_path_list does not support the list_var being ${ARGV1}.
-    Please use a different variable name.")
+        message(FATAL_ERROR "vcpkg_host_path_list 不支持 list_var 为 ${ARGV1}。
+    请使用不同的变量名。")
     endif()
 
     if("${ARGV1}" MATCHES [[^ENV\{(.*)\}$]])
         set(list "$ENV{${CMAKE_MATCH_1}}")
         set(env_var ON)
     elseif("${ARGV1}" MATCHES [[^([A-Z]+)\{.*\}$]])
-        message(FATAL_ERROR "vcpkg_host_path_list does not support ${CMAKE_MATCH_1} variables;
-    only ENV{} and regular variables are supported.")
+        message(FATAL_ERROR "vcpkg_host_path_list 不支持 ${CMAKE_MATCH_1} 变量；
+    仅支持 ENV{} 和常规变量。")
     else()
         set(list "${${ARGV1}}")
         set(env_var OFF)
@@ -25,7 +25,7 @@ function(vcpkg_host_path_list)
     set(bad_items "${arg_UNPARSED_ARGUMENTS}")
     list(FILTER bad_items INCLUDE REGEX "[${VCPKG_HOST_PATH_SEPARATOR}]")
     if(NOT "${bad_items}" STREQUAL "")
-        message(FATAL_ERROR "Host path separator (${VCPKG_HOST_PATH_SEPARATOR}) in path; this is unsupported.")
+        message(FATAL_ERROR "路径中包含主机路径分隔符 (${VCPKG_HOST_PATH_SEPARATOR})；此操作不受支持。")
     endif()
 
     if("${operation}" STREQUAL "SET")
@@ -53,7 +53,7 @@ function(vcpkg_host_path_list)
         list(REMOVE_DUPLICATES current_list)
         cmake_path(CONVERT "${current_list}" TO_NATIVE_PATH_LIST list)
     else()
-        message(FATAL_ERROR "Operation ${operation} not recognized.")
+        message(FATAL_ERROR "无法识别的操作 ${operation}。")
     endif()
 
     if(env_var)

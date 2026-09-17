@@ -1,4 +1,4 @@
-function(z_vcpkg_prettify_command_line out_var)
+﻿function(z_vcpkg_prettify_command_line out_var)
     set(output_list "")
     z_vcpkg_function_arguments(args 1)
     foreach(v IN LISTS args)

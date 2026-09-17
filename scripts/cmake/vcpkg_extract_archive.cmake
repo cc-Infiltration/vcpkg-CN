@@ -1,4 +1,4 @@
-function(vcpkg_extract_archive)
+﻿function(vcpkg_extract_archive)
     cmake_parse_arguments(PARSE_ARGV 0 "arg"
         ""
         "ARCHIVE;DESTINATION"
@@ -7,16 +7,16 @@ function(vcpkg_extract_archive)
 
     foreach(arg_name IN ITEMS ARCHIVE DESTINATION)
         if(NOT DEFINED "arg_${arg_name}")
-            message(FATAL_ERROR "${arg_name} is required.")
+            message(FATAL_ERROR "${arg_name} 是必需的。")
         endif()
     endforeach()
 
     if(DEFINED arg_UNPARSED_ARGUMENTS)
-        message(FATAL_ERROR "Unrecognized arguments: ${arg_UNPARSED_ARGUMENTS}")
+        message(FATAL_ERROR "无法识别的参数: ${arg_UNPARSED_ARGUMENTS}")
     endif()
 
     if(EXISTS "${arg_DESTINATION}")
-        message(FATAL_ERROR "${arg_DESTINATION} was an extraction target, but it already exists.")
+        message(FATAL_ERROR "${arg_DESTINATION} 是解压目标，但它已经存在。")
     endif()
 
     file(MAKE_DIRECTORY "${arg_DESTINATION}")

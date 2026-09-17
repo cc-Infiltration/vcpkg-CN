@@ -1,4 +1,4 @@
-set(program_name "ruby")
+﻿set(program_name "ruby")
 set(program_version 2.7.4-1)
 if(CMAKE_HOST_WIN32)
     set(download_urls "https://github.com/oneclick/rubyinstaller2/releases/download/RubyInstaller-${program_version}/rubyinstaller-${program_version}-x86.7z")

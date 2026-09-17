@@ -1,4 +1,4 @@
-set(program_name dark)
+﻿set(program_name dark)
 if(CMAKE_HOST_WIN32)
     set(tool_subdirectory "wix311-binaries")
     set(paths_to_search "${DOWNLOADS}/tools/dark/${tool_subdirectory}")

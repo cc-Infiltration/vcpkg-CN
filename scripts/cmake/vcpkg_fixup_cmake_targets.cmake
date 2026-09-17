@@ -1,12 +1,12 @@
-function(vcpkg_fixup_cmake_targets)
+﻿function(vcpkg_fixup_cmake_targets)
     if(Z_VCPKG_CMAKE_CONFIG_FIXUP_GUARD)
-        message(FATAL_ERROR "The ${PORT} port already depends on vcpkg-cmake-config; using both vcpkg-cmake-config and vcpkg_fixup_cmake_targets in the same port is unsupported.")
+        message(FATAL_ERROR "${PORT} 端口已经依赖 vcpkg-cmake-config；在同一端口中同时使用 vcpkg-cmake-config 和 vcpkg_fixup_cmake_targets 是不受支持的。")
     endif()
 
     cmake_parse_arguments(PARSE_ARGV 0 arg "DO_NOT_DELETE_PARENT_CONFIG_PATH;NO_PREFIX_CORRECTION" "CONFIG_PATH;TARGET_PATH;TOOLS_PATH" "")
 
     if(arg_UNPARSED_ARGUMENTS)
-        message(FATAL_ERROR "vcpkg_fixup_cmake_targets was passed extra arguments: ${arg_UNPARSED_ARGUMENTS}")
+        message(FATAL_ERROR "vcpkg_fixup_cmake_targets 被传递了多余的参数: ${arg_UNPARSED_ARGUMENTS}")
     endif()
 
     if(NOT arg_TARGET_PATH)
@@ -33,10 +33,10 @@ function(vcpkg_fixup_cmake_targets)
         set(RELEASE_CONFIG ${CURRENT_PACKAGES_DIR}/${arg_CONFIG_PATH})
         if(NOT DEFINED VCPKG_BUILD_TYPE OR VCPKG_BUILD_TYPE STREQUAL "debug")
             if(NOT EXISTS ${DEBUG_CONFIG})
-                message(FATAL_ERROR "'${DEBUG_CONFIG}' does not exist.")
+                message(FATAL_ERROR "'${DEBUG_CONFIG}' 不存在。")
             endif()
 
-            # This roundabout handling enables CONFIG_PATH share
+            # 这种迂回处理方式使得 CONFIG_PATH share 成为可能
             file(MAKE_DIRECTORY ${DEBUG_SHARE})
             file(GLOB FILES ${DEBUG_CONFIG}/*)
             file(COPY ${FILES} DESTINATION ${DEBUG_SHARE})
@@ -78,7 +78,7 @@ function(vcpkg_fixup_cmake_targets)
 
     if(NOT DEFINED VCPKG_BUILD_TYPE OR VCPKG_BUILD_TYPE STREQUAL "debug")
         if(NOT EXISTS "${DEBUG_SHARE}")
-            message(FATAL_ERROR "'${DEBUG_SHARE}' does not exist.")
+            message(FATAL_ERROR "'${DEBUG_SHARE}' 不存在。")
         endif()
     endif()
 
@@ -120,22 +120,21 @@ function(vcpkg_fixup_cmake_targets)
         endforeach()
     endif()
 
-    #Fix ${_IMPORT_PREFIX} in cmake generated targets and configs;
-    #Since those can be renamed we have to check in every *.cmake
+    #修复 cmake 生成的 targets 和 configs 中的 ${_IMPORT_PREFIX}；
+    #由于这些文件可能被重命名，因此必须检查每个 *.cmake 文件
     file(GLOB_RECURSE MAIN_CMAKES "${RELEASE_SHARE}/*.cmake")
 
     foreach(MAIN_CMAKE IN LISTS MAIN_CMAKES)
         file(READ ${MAIN_CMAKE} _contents)
-        #This correction is not correct for all cases. To make it correct for all cases it needs to consider
-        #original folder deepness to CURRENT_PACKAGES_DIR in comparison to the moved to folder deepness which
-        #is always at least (>=) 2, e.g. share/${PORT}. Currently the code assumes it is always 2 although
-        #this requirement is only true for the *Config.cmake. The targets are not required to be in the same
-        #folder as the *Config.cmake!
+        #此修正并非对所有情况都正确。要使其对所有情况都正确，需要考虑
+        #原始文件夹相对于 CURRENT_PACKAGES_DIR 的深度，与移动后文件夹深度的比较，
+        #移动后的深度总是至少（>=）2，例如 share/${PORT}。目前代码假设深度总是 2，尽管
+        #此要求仅对 *Config.cmake 成立。targets 不要求与 *Config.cmake 在同一文件夹中！
         if(NOT arg_NO_PREFIX_CORRECTION)
             string(REGEX REPLACE
                 "get_filename_component\\(_IMPORT_PREFIX \"\\\${CMAKE_CURRENT_LIST_FILE}\" PATH\\)(\nget_filename_component\\(_IMPORT_PREFIX \"\\\${_IMPORT_PREFIX}\" PATH\\))*"
                 "get_filename_component(_IMPORT_PREFIX \"\${CMAKE_CURRENT_LIST_FILE}\" PATH)\nget_filename_component(_IMPORT_PREFIX \"\${_IMPORT_PREFIX}\" PATH)\nget_filename_component(_IMPORT_PREFIX \"\${_IMPORT_PREFIX}\" PATH)"
-                _contents "${_contents}") # see #1044 for details why this replacement is necessary. See #4782 why it must be a regex.
+                _contents "${_contents}") # 参见 #1044 了解为何需要此替换。参见 #4782 了解为何必须使用正则表达式。
             string(REGEX REPLACE
                 "get_filename_component\\(PACKAGE_PREFIX_DIR \"\\\${CMAKE_CURRENT_LIST_DIR}/\\.\\./(\\.\\./)*\" ABSOLUTE\\)"
                 "get_filename_component(PACKAGE_PREFIX_DIR \"\${CMAKE_CURRENT_LIST_DIR}/../../\" ABSOLUTE)"
@@ -143,37 +142,36 @@ function(vcpkg_fixup_cmake_targets)
             string(REGEX REPLACE
                 "get_filename_component\\(PACKAGE_PREFIX_DIR \"\\\${CMAKE_CURRENT_LIST_DIR}/\\.\\.((\\\\|/)\\.\\.)*\" ABSOLUTE\\)"
                 "get_filename_component(PACKAGE_PREFIX_DIR \"\${CMAKE_CURRENT_LIST_DIR}/../../\" ABSOLUTE)"
-                _contents "${_contents}") # This is a meson-related workaround, see https://github.com/mesonbuild/meson/issues/6955
+                _contents "${_contents}") # 这是一个与 meson 相关的变通方案，参见 https://github.com/mesonbuild/meson/issues/6955
         endif()
 
-        #Fix wrongly absolute paths to install dir with the correct dir using ${_IMPORT_PREFIX}
-        #This happens if vcpkg built libraries are directly linked to a target instead of using
-        #an imported target for it. We could add more logic here to identify defect target files.
-        #Since the replacement here in a multi config build always requires a generator expression
-        #in front of the absoulte path to ${CURRENT_INSTALLED_DIR}. So the match should always be at
-        #least >:${CURRENT_INSTALLED_DIR}.
-        #In general the following generator expressions should be there:
+        #使用 ${_IMPORT_PREFIX} 修复错误的指向安装目录的绝对路径
+        #当 vcpkg 构建的库被直接链接到某个 target 而非使用 imported target 时，
+        #会发生此问题。可以在此添加更多逻辑来识别有缺陷的 target 文件。
+        #由于在多配置构建中此处的替换总是需要在前方使用生成器表达式，
+        #因此匹配应始终至少为 >:${CURRENT_INSTALLED_DIR}。
+        #通常应存在以下生成器表达式：
         #\$<\$<CONFIG:DEBUG>:${CURRENT_INSTALLED_DIR}/debug/lib/somelib>
-        #and/or
+        #和/或
         #\$<\$<NOT:\$<CONFIG:DEBUG>>:${CURRENT_INSTALLED_DIR}/lib/somelib>
-        #with ${CURRENT_INSTALLED_DIR} being fully expanded
+        #其中 ${CURRENT_INSTALLED_DIR} 被完全展开
         string(REPLACE "${CURRENT_INSTALLED_DIR}" [[${_IMPORT_PREFIX}]] _contents "${_contents}")
         file(WRITE ${MAIN_CMAKE} "${_contents}")
     endforeach()
 
-    # Remove /debug/<target_path>/ if it's empty.
+    # 如果 /debug/<target_path>/ 为空则移除它。
     file(GLOB_RECURSE REMAINING_FILES "${DEBUG_SHARE}/*")
     if(NOT REMAINING_FILES)
         file(REMOVE_RECURSE ${DEBUG_SHARE})
     endif()
 
-    # Remove /debug/share/ if it's empty.
+    # 如果 /debug/share/ 为空则移除它。
     file(GLOB_RECURSE REMAINING_FILES "${CURRENT_PACKAGES_DIR}/debug/share/*")
     if(NOT REMAINING_FILES)
         file(REMOVE_RECURSE ${CURRENT_PACKAGES_DIR}/debug/share)
     endif()
 
-    # Patch out any remaining absolute references
+    # 修补掉所有剩余的绝对路径引用
     file(TO_CMAKE_PATH "${CURRENT_PACKAGES_DIR}" CMAKE_CURRENT_PACKAGES_DIR)
     file(GLOB CMAKE_FILES ${RELEASE_SHARE}/*.cmake)
     foreach(CMAKE_FILE IN LISTS CMAKE_FILES)

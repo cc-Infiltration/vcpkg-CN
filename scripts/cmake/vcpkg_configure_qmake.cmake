@@ -1,16 +1,16 @@
-function(vcpkg_configure_qmake)
-    # parse parameters such that semicolons in options arguments to COMMAND don't get erased
+﻿function(vcpkg_configure_qmake)
+    # 解析参数，使得 COMMAND 选项参数中的分号不会被擦除
     cmake_parse_arguments(PARSE_ARGV 0 arg
         ""
         "SOURCE_PATH"
         "OPTIONS;OPTIONS_RELEASE;OPTIONS_DEBUG;BUILD_OPTIONS;BUILD_OPTIONS_RELEASE;BUILD_OPTIONS_DEBUG"
     )
 
-    # Find qmake executable
+    # 查找 qmake 可执行文件
     find_program(qmake_executable NAMES qmake PATHS "${CURRENT_HOST_INSTALLED_DIR}/tools/qt5/bin" NO_DEFAULT_PATH)
 
     if(NOT qmake_executable)
-        message(FATAL_ERROR "vcpkg_configure_qmake: unable to find qmake.")
+        message(FATAL_ERROR "vcpkg_configure_qmake: 无法找到 qmake。")
     endif()
 
     z_vcpkg_get_cmake_vars(cmake_vars_file)
@@ -18,18 +18,18 @@ function(vcpkg_configure_qmake)
 
     function(qmake_append_program var qmake_var value)
         get_filename_component(prog "${value}" NAME)
-        # QMake assumes everything is on PATH?
+        # QMake 假定所有程序都在 PATH 中？
         vcpkg_list(APPEND ${var} "${qmake_var}=${prog}")
         find_program(${qmake_var} NAMES "${prog}")
         cmake_path(COMPARE "${${qmake_var}}" EQUAL "${value}" correct_prog_on_path)
         if(NOT correct_prog_on_path AND NOT "${value}" MATCHES "|:")
-            message(FATAL_ERROR "Detect path mismatch for '${qmake_var}'. '${value}' is not the same as '${${qmake_var}}'. Please correct your PATH!")
+            message(FATAL_ERROR "检测到路径不匹配: '${qmake_var}'。'${value}' 与 '${${qmake_var}}' 不相同。请更正您的 PATH！")
         endif()
         unset(${qmake_var})
         unset(${qmake_var} CACHE)
         set(${var} "${${var}}" PARENT_SCOPE)
     endfunction()
-    # Setup Build tools
+    # 设置构建工具
     set(qmake_build_tools "")
     qmake_append_program(qmake_build_tools "QMAKE_CC" "${VCPKG_DETECTED_CMAKE_C_COMPILER}")
     qmake_append_program(qmake_build_tools "QMAKE_CXX" "${VCPKG_DETECTED_CMAKE_CXX_COMPILER}")
@@ -79,12 +79,12 @@ function(vcpkg_configure_qmake)
 
         set(current_binary_dir "${CURRENT_BUILDTREES_DIR}/${TARGET_TRIPLET}-rel")
 
-        # Cleanup build directories
+        # 清理构建目录
         file(REMOVE_RECURSE "${current_binary_dir}")
 
         configure_file("${CURRENT_INSTALLED_DIR}/tools/qt5/qt_release.conf" "${current_binary_dir}/qt.conf")
-    
-        message(STATUS "Configuring ${TARGET_TRIPLET}-rel")
+
+        message(STATUS "正在配置 ${TARGET_TRIPLET}-rel")
         file(MAKE_DIRECTORY "${current_binary_dir}")
 
         qmake_add_flags("QMAKE_LIBS" "+=" "${VCPKG_DETECTED_CMAKE_C_STANDARD_LIBRARIES} ${VCPKG_DETECTED_CMAKE_CXX_STANDARD_LIBRARIES}")
@@ -110,7 +110,7 @@ function(vcpkg_configure_qmake)
             LOGNAME "config-${TARGET_TRIPLET}-rel"
             SAVE_LOG_FILES config.log
         )
-        message(STATUS "Configuring ${TARGET_TRIPLET}-rel done")
+        message(STATUS "配置 ${TARGET_TRIPLET}-rel 完成")
         if(EXISTS "${current_binary_dir}/config.log")
             file(REMOVE "${CURRENT_BUILDTREES_DIR}/internal-config-${TARGET_TRIPLET}-rel.log")
             file(RENAME "${current_binary_dir}/config.log" "${CURRENT_BUILDTREES_DIR}/internal-config-${TARGET_TRIPLET}-rel.log")
@@ -124,12 +124,12 @@ function(vcpkg_configure_qmake)
 
         set(current_binary_dir "${CURRENT_BUILDTREES_DIR}/${TARGET_TRIPLET}-dbg")
 
-        # Cleanup build directories
+        # 清理构建目录
         file(REMOVE_RECURSE "${current_binary_dir}")
 
         configure_file("${CURRENT_INSTALLED_DIR}/tools/qt5/qt_debug.conf" "${current_binary_dir}/qt.conf")
 
-        message(STATUS "Configuring ${TARGET_TRIPLET}-dbg")
+        message(STATUS "正在配置 ${TARGET_TRIPLET}-dbg")
         file(MAKE_DIRECTORY "${current_binary_dir}")
 
         set(qmake_comp_flags "")
@@ -155,7 +155,7 @@ function(vcpkg_configure_qmake)
             LOGNAME "config-${TARGET_TRIPLET}-dbg"
             SAVE_LOG_FILES config.log
         )
-        message(STATUS "Configuring ${TARGET_TRIPLET}-dbg done")
+        message(STATUS "配置 ${TARGET_TRIPLET}-dbg 完成")
         if(EXISTS "${current_binary_dir}/config.log")
             file(REMOVE "${CURRENT_BUILDTREES_DIR}/internal-config-${TARGET_TRIPLET}-dbg.log")
             file(RENAME "${current_binary_dir}/config.log" "${CURRENT_BUILDTREES_DIR}/internal-config-${TARGET_TRIPLET}-dbg.log")

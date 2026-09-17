@@ -1,4 +1,4 @@
-set(program_name perl)
+﻿set(program_name perl)
 set(program_version 5.42.2.1)
 set(brew_package_name "perl")
 set(apt_package_name "perl")
